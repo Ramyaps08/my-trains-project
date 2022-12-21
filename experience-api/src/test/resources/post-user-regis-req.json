@@ -1,0 +1,11 @@
+{
+  "profile": {
+    "firstName": "Vivek122",
+    "lastName": "Brock122",
+    "email": "VivekB122@gmail.com",
+    "login": "VivekB122@gmail.com"
+  },
+  "credentials": {
+    "password" : { "value": "Flower@123" }
+  }
+}

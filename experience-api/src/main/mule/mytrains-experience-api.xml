@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="mytrains-experience-api-config" api="mytrains-experience-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="mytrains-experience-api-main" doc:id="224d8e0b-3ecd-4f53-96f4-54326397192f">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="mytrains-experience-api-config" />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="mytrains-experience-api-console" doc:id="4f00d1dc-78ab-4375-94df-e44b6182b1d5">
+        <http:listener config-ref="HTTP_Listener_config" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="mytrains-experience-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\subscription\updatesubscription:application\json:mytrains-experience-api-config" doc:id="1272404b-02e8-4f67-8bb1-c1a41f7f5a2e">
+		<flow-ref doc:name="putUpdateSubscription-v2" doc:id="b3913c36-c1b1-4498-9684-6831413d3d25" name="putUpdateSubscription-v2"/>
+    </flow>
+    <flow name="put:\updateuser:application\json:mytrains-experience-api-config" doc:id="7449f9d4-5b99-4781-b060-baab64729ed7">
+		<flow-ref doc:name="putUpdateUser-v2" doc:id="e530fa88-424a-46af-8f3f-faf1a99c28a1" name="putUpdateUser-v2"/>
+    </flow>
+    <flow name="delete:\logout:mytrains-experience-api-config" doc:id="4a9d12ec-ede9-41c5-88b4-c427860855b5">
+		<flow-ref doc:name="DELETELogOut-v2" doc:id="cef9de3a-c9ec-42b7-8d03-b92897b068a3" name="DELETELogOut-v2"/>
+    </flow>
+    <flow name="get:\usersubscription:mytrains-experience-api-config" doc:id="d800e859-44d4-47c4-bf51-30255b269c73" >
+		<flow-ref doc:name="getSubscriptiondetails" doc:id="3216c391-d959-4b09-8e5d-9dbec00f4dc8" name="getSubscriptiondetails"/>
+	</flow>
+	<flow name="get:\userinfo:mytrains-experience-api-config" doc:id="cefcaefc-2696-4768-bafe-2080b404eee7" >
+		<flow-ref doc:name="getUserinfo" doc:id="58d318af-9ecf-4936-b5cc-8e965b8e8303" name="getUserinfo"/>
+	</flow>
+	<flow name="post:\change_password:application\json:mytrains-experience-api-config" doc:id="f17846e3-6858-4042-ae1a-b8c191617e2a">
+		<flow-ref doc:name="postChangePassword-v2" doc:id="737286c9-02be-4192-8a70-1e11ca9daf3e" name="postChangePassword-v2"/>
+    </flow>
+    <flow name="post:\login:application\json:mytrains-experience-api-config" doc:id="ee7901c3-d903-43bf-bcfe-397738fa3f64">
+		<flow-ref doc:name="postLogin-v2" doc:id="0f31ae0d-67a8-4f8f-930b-f78044a113b5" name="postLogin-v2"/>
+    </flow>
+    <flow name="post:\recoverypassword:application\json:mytrains-experience-api-config" doc:id="3155e7d6-eaf4-42d7-94f1-7c7af74f3d63">
+		<flow-ref doc:name="postRecoveryPassword-v2" doc:id="ceef85ea-7b3c-494c-ba84-fd8ae994132c" name="postRecoveryPassword-v2"/>
+    </flow>
+    <flow name="post:\subscription:application\json:mytrains-experience-api-config" doc:id="8eb23910-52a2-4f9e-85c0-7ed2d0bb41d9">
+		<flow-ref doc:name="postSubscription-v2" doc:id="a957000a-00a5-4b7a-9749-5c48f9313886" name="postSubscription-v2"/>
+    </flow>
+    <flow name="post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="dcfc809a-1b80-4155-a3d9-290c07f05bdb">
+		<flow-ref doc:name="postUserRegistration-v2" doc:id="1a3e13e9-fd0a-42fd-abd4-8c753d2478d5" name="postUserRegistration-v2"/>
+		<error-handler ref="global-error-handler" />
+    </flow>
+</mule>

@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_471810ac_1456_4177_8aec_ad36d8a5f4cd_Output_Payload = {
+  password: String, 
+  options: {
+    warnBeforePasswordExpired: Boolean, 
+    multiOptionalFactorEnroll: Boolean, 
+    _?: Any
+  } {"label": "options"}, 
+  userName: String, 
+  _?: Any
+} {"label": "Primary Authentication"}
+

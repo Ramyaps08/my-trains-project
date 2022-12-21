@@ -1,0 +1,15 @@
+%dw 2.0
+// namespaces
+ns ns0 http://thalesgroup.com/RTTI/2017-10-01/ldb/
+
+type auto_9752431f_a367_4509_a394_7da175c4ad83_Output_Variables_RequestBody = {|
+  ns0#GetArrBoardWithDetailsRequest: {|
+    ns0#numRows: Number, 
+    ns0#crs: String, 
+    ns0#filterCrs: String, 
+    ns0#filterType: String, 
+    ns0#timeOffset: Number, 
+    ns0#timeWindow: Number
+  |}
+|}
+

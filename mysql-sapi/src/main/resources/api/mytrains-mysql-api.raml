@@ -1,0 +1,130 @@
+#%RAML 1.0
+title: MyTrains-Mysql-API
+description: "Storing Data"
+uses:
+  mysql-library: /exchange_modules/a6a89936-028e-4081-b802-1965f45926ed/mysql-fragment-api/1.0.4/mysql-fragment-api.raml
+
+/userdetails:
+  post:
+    description: "stores user details"
+    body:
+      application/json:
+        type: mysql-library.User
+        example: !include /Example/Userexample.json
+          
+        
+    responses:
+          201:
+            body:
+              application/json:
+                example: User details stored successfully
+                  
+/user/{userid}/updateuser:
+  put:
+    description: "updating user details"
+    body:
+      application/json:
+        type: mysql-library.UpdateUser
+        example: !include /Example/Userexample.json
+          
+    responses:
+      201:
+        body:
+          application/json:
+            example: "User details updated"
+              
+           
+/user/{userid}:
+  get:
+    description: "get user details with userid" 
+    responses:
+      200:
+        body:
+          application/json:
+            type: mysql-library.User
+                              
+/user/{userid}/subscription:
+  post:
+    description: "stores user subscribed train details"
+    body:
+      application/json:
+        type: mysql-library.SubscriptionTable
+        example: !include /Example/subscriptionexample.json
+    responses:
+          201:
+            body:
+              application/json:
+                type: mysql-library.SubscriptionTable
+  put:
+    description: "Updating train Subscriptions"
+    body:
+      application/json:
+        type: mysql-library.UpdateSubscription
+    responses:
+          201:
+            body:
+              application/json:
+                example: Subscription updated for user
+               
+  get:
+    description: "view subscription details"
+    responses:
+      200:
+        body:
+          application/json:
+            type: mysql-library.SubscriptionTable
+/subscribedusers:
+  get:
+    description: "get subscribed user details"   
+    responses:
+      200:
+        body:
+          application/json:
+            type: mysql-library.User
+
+/users/subscription:
+  get:
+    description: "subscribers based on the location"    
+    queryParameters:
+      fromStation:
+
+      toStation:
+    responses:
+      200:
+        body:
+          application/json:
+            type: mysql-library.SubscriptionTable              
+
+/alerts:
+  post:
+    description: "notifications for all train details"   
+    body:
+      application/json:
+        type: mysql-library.Alerts
+    responses:
+          200:
+            body:
+              application/json:
+                type: mysql-library.Alerts
+                
+
+                  
+              
+      
+                                
+                  
+                
+                    
+          
+        
+                     
+                  
+
+
+                    
+      
+                
+                                           
+
+                  
+                  

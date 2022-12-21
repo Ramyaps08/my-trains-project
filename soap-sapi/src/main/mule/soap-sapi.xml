@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="887fb35e-98c0-4db0-86f1-b82ed187f04c" >
+		<wsc:connection wsdlLocation="https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01" service="ldb" port="LDBServiceSoap12" address="https://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb11.asmx" soapVersion="SOAP12">
+		</wsc:connection>
+	</wsc:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="deede367-98f1-44d2-99a3-1e79adef4b50" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="5ec20d59-bf6c-4c65-bca3-e3844cba5487" environment="${mule.env}" />
+	<global-property doc:name="Global Property" doc:id="973cc309-4fee-4a47-ae4c-b652bf0b3981" name="json.logger.application.name" value="jsonlogger" />
+	<global-property doc:name="Global Property" doc:id="398d3484-99e6-4770-862d-46a6dcb785c0" name="json.logger.application.version" value="3" />
+	<global-property doc:name="Global Property" doc:id="b204d684-1b95-4c50-b9e7-01160c9e4e6b" name="mule.env" value="dev" />
+	<flow name="postBoardDetails" doc:id="9752431f-a367-4509-a394-7da175c4ad83" >
+		<!-- <http:listener doc:name="Listener" doc:id="d8f5937c-6d5f-4390-87f3-4634c5211c7d" config-ref="HTTP_Listener_config" path="/boarddetails"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="bf82b465-77b4-4011-8b58-4534ba41c6c3" config-ref="JSON_Logger_Config" message="Get arrival board details"/>
+		<ee:transform doc:name="Transform Message" doc:id="d1093e33-c272-4a26-9032-f922e8422ccd" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="RequestBody" ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://thalesgroup.com/RTTI/2017-10-01/ldb/
+---
+{
+	ns0#GetArrBoardWithDetailsRequest: {
+		ns0#numRows: payload.GetArrBoardWithDetailsRequest.numRows,
+		ns0#crs: payload.GetArrBoardWithDetailsRequest.crs,
+		ns0#filterCrs: payload.GetArrBoardWithDetailsRequest.filterCrs,
+		ns0#filterType: payload.GetArrBoardWithDetailsRequest.filterType,
+		ns0#timeOffset: payload.GetArrBoardWithDetailsRequest.timeOffset,
+		ns0#timeWindow: payload.GetArrBoardWithDetailsRequest.timeWindow
+	}
+}]]></ee:set-variable>
+				<ee:set-variable variableName="RequestHeader" ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://thalesgroup.com/RTTI/2013-11-28/Token/types
+---
+{
+	ns0#AccessToken: {
+		ns0#TokenValue: payload.AccessToken.TokenValue
+	}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<wsc:consume doc:name="WebSerive GetArr Consume" doc:id="2418a1ea-859b-449b-be2f-f27058b02ddf" config-ref="Web_Service_Consumer_Config" operation="GetArrBoardWithDetails">
+			<wsc:message >
+				<wsc:body ><![CDATA[#[vars.RequestBody]]]></wsc:body>
+				<wsc:headers ><![CDATA[#[{
+	headers:vars.RequestHeader
+	
+	}]]]></wsc:headers>
+			</wsc:message>
+		</wsc:consume>
+		<ee:transform doc:name="Transform Message" doc:id="6b0880a6-4a49-49d2-ab53-232cd5a769c4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0ns ns0 http://thalesgroup.com/RTTI/2017-10-01/ldb/
+
+output application/json
+---
+payload.body]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:id="0640ecec-c9f7-45dc-8b65-b20e85e36710" config-ref="JSON_Logger_Config" message="Arrival Board details"/>
+	</flow>
+</mule>

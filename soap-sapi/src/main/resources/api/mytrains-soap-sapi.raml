@@ -1,0 +1,32 @@
+#%RAML 1.0
+title: MyTrains-SOAP-SAPI
+description: "Used to get arrival board details"
+uses:
+  nr-soap-library: /exchange_modules/a6a89936-028e-4081-b802-1965f45926ed/sopa-api-fragment/1.0.4/sopa-api-fragment.raml
+/boarddetails:
+  post:
+    description: "get arrival details"
+    body:
+      application/json:
+         example: !include Examples/SOAPbody.json
+  
+   
+    responses:
+      201:
+        body:
+          application/json:
+         
+            
+              
+                        
+      
+        
+        
+        
+ 
+  
+
+
+  
+
+    

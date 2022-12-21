@@ -1,0 +1,160 @@
+#%RAML 1.0
+baseUri: https://dev-63431661.okta.com/api/v1
+title: MyTrains-Okta-SAPI
+description: "OKTA Registration API"
+mediaType: -application/json
+version: v1
+protocols: https
+uses:
+  Okta-library: /exchange_modules/a6a89936-028e-4081-b802-1965f45926ed/okta-api-fragment/1.0.3/okta-api-fragment.raml
+  
+
+/users:
+  post:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: "Create User"
+    queryParameters:
+      activate:
+        required: true
+        type: boolean
+    body:
+      application/json:
+        type: Okta-library.createuser
+        example: !include /Examples/OktaExampleUserBody.json
+          
+    responses:
+            201:
+              body:
+                application/json:
+                  example: "user created"
+                    
+/users/{userid}/credentials/change_password:
+  post:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: Change Password
+    body:
+      application/json:
+        type: Okta-library.changepassword
+        example: !include /Examples/OktaExampleChangePasswordBody.json
+          
+          
+    responses:
+            201:
+              body:
+                application/json:
+                  example: "Password changed"
+                    
+/authn:
+  post:
+    headers:
+      Content-Type: 
+    description: "Primary Authentication"
+    body:
+      application/json:
+        type: Okta-library.primaryauthentication
+        example: !include /Examples/OktaExampleAuthenticationBody.json
+              
+    responses:
+            201:
+              body:
+                application/json:
+                  type: Okta-library.primaryauthentication
+                    
+/authn/recovery/password:
+  post:
+    description: "Forgot Password"
+    body:
+      application/json:
+        type: Okta-library.forgotpassword
+        example: !include /Examples/OktaExampleAuthenticationForgotPasswordBody.json
+
+    responses:
+      201:
+        body:
+          application/json:
+           example: "Password recovered"
+             
+              
+/sessions:
+  post:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: "Create Session With Session Token"
+    queryParameters:
+      additionalFields:
+        required: true
+        example: "cookieToken"
+        type: string
+    body:
+      application/json:
+        type: Okta-library.createsession
+        example: !include /Examples/SessionwithSessionTokenBody.json
+            
+    responses:
+      201:
+        body:
+          application/json:
+            type: Okta-library.createsession
+             
+/sessions/{sessionid}:
+  get:
+    headers:
+      Accept: 
+    description: "Validate SessionID"
+    responses:
+      200:
+        body:
+          application/json:
+            example: "Validated SessionID"
+             
+
+  delete:
+    
+    description: "Clear Session"
+    responses:
+      204:
+       
+        body:
+          application/json:
+            type: string
+            example:
+              description:"cleared session successfully"
+
+              
+    
+
+      
+
+    
+
+
+    
+                             
+            
+            
+                          
+        
+            
+                          
+
+          
+                                                        
+          
+                                 
+                    
+                
+                    
+                                          
+
+  
+                                     
+                    
+                          

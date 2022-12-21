@@ -1,0 +1,46 @@
+{
+    "id": "102myl290q6QciNuZj5XgXpEA",
+    "userId": "00u7g8ds7vJ8IDTr45d7",
+    "login": "iNamitaB89@gmail.com",
+    "createdAt": "2022-11-30T03:56:07.000Z",
+    "expiresAt": "2022-11-30T05:56:07.000Z",
+    "status": "ACTIVE",
+    "lastPasswordVerification": "2022-11-30T03:56:07.000Z",
+    "lastFactorVerification": "2022-11-30T03:56:07.000Z",
+    "amr": [
+        "pwd"
+    ],
+    "idp": {
+        "id": "00o7cx4m04u8tyVUk5d7",
+        "type": "OKTA"
+    },
+    "mfaActive": true,
+    "_links": {
+        "self": {
+            "href": "https://dev-63431661.okta.com/api/v1/sessions/1023zOzKBVoRVOsltnRQNi1Gg",
+            "hints": {
+                "allow": [
+                    "GET",
+                    "DELETE"
+                ]
+            }
+        },
+        "refresh": {
+            "href": "https://dev-63431661.okta.com/api/v1/sessions/1023zOzKBVoRVOsltnRQNi1Gg/lifecycle/refresh",
+            "hints": {
+                "allow": [
+                    "POST"
+                ]
+            }
+        },
+        "user": {
+            "name": "Namita89 Brock4",
+            "href": "https://dev-63431661.okta.com/api/v1/users/00u7g8ds7vJ8IDTr45d7",
+            "hints": {
+                "allow": [
+                    "GET"
+                ]
+            }
+        }
+    }
+}

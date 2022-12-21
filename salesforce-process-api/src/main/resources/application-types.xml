@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="usertable" format="json">
+      <types:shape format="weave" example="examples/USERTABLE.json"><![CDATA[%dw 2.0
+
+type usertable = {|
+  USER_ID: String, 
+  EMAIL_ID: String, 
+  FIRST_NAME: String, 
+  LAST_NAME: String, 
+  PHONE_NUMBER: String, 
+  CREATED_TIMESTAMP: String, 
+  UPDATED_TIMESTAMP: String
+|} {"example": "{\\\"USER_ID\\\":\\\"00u7mi4vl965esL6p5d7\\\",\\\"EMAIL_ID\\\":\\\"VivekB123@gmail.com\\\",\\\"FIRST_NAME\\\":\\\"Vivek\\\",\\\"LAST_NAME\\\":\\\"Brock\\\",\\\"PHONE_NUMBER\\\":\\\"9876543210\\\",\\\"CREATED_TIMESTAMP\\\":\\\"2022 - 12 - 13 23: 26: 52\\\",\\\"UPDATED_TIMESTAMP\\\":\\\"2022 - 12 - 13 23: 26: 52\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#1662e1b6-9986-4ff3-a7d5-cad9c7ef0495">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="usertable"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

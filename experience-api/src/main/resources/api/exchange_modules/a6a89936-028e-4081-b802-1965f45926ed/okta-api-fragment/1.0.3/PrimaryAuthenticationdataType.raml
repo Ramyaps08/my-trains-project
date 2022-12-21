@@ -1,0 +1,31 @@
+#%RAML 1.0 DataType
+type: object
+displayName: Primary Authentication
+properties:
+  username:
+    type: string
+    required: true
+    displayName: "username"
+    example: "michaelb@example.com"
+  password:
+    type: string
+    required: true
+    displayName: "password"
+    example: "setitup#12"
+  options:
+    type: object
+    required: true
+    displayName: options
+    properties:
+      multiOptionalFactorEnroll:
+        type: boolean
+        required: true
+        displayName: "multiOptionalFactorEnroll"
+        example: true
+      warnBeforePasswordExpired:
+        type: boolean
+        required: true
+        displayName: "warnBeforePasswordExpired"  
+        example: true
+
+              

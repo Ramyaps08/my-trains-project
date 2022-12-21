@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d89c15a3-59f8-47fd-97a8-2f620425dd89" >
+		<http:listener-connection host="0.0.0.0" port="8071" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c04013d2-eac6-4159-b9dd-b67187feb083" responseTimeout="100000">
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="0a42bb7f-c56f-48a4-871a-08eed0866f8d" environment="${mule.env}" />
+	<global-property doc:name="Global Property" doc:id="efb539df-6a89-4bdd-a69c-3d95f2597bc7" name="json.logger.application.name" value="jsonlogger" />
+	<global-property doc:name="Global Property" doc:id="28df5882-3106-4734-a94d-35fab54dbf5e" name="json.logger.application.version" value="2" />
+	<global-property doc:name="Global Property" doc:id="a57d6817-1fe7-40a9-8af0-0805e5fde934" name="mule.env" value="4" />
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="a98845d4-6e39-4ad3-8bad-37849a2772a5" responseTimeout="900000">
+		<http:request-connection host="localhost" port="8091" />
+	</http:request-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="85040d13-d63c-483c-804b-1a417a474481" entryTtl="2" entryTtlUnit="HOURS" />
+	<flow name="postUserRegistration-v2" doc:id="d5666d4e-35bb-45da-9863-060adf895deb" >
+		<!-- <http:listener doc:name="POST/usersregistration" doc:id="29d2f60b-4a5c-448f-9c78-358e2e5f6cbc" path="/usersregistration" config-ref="HTTP_Listener_config"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="d72c46d9-c86b-4a47-b928-e38f7de9d324" config-ref="JSON_Logger_Config" message="Registration"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="340c21fd-1982-4b2b-bbcb-f729192456c4" variableName="original_pl"/>
+		<http:request method="POST" doc:name="Request" doc:id="b36f8660-9323-433e-aeef-ba53c14c54b9" config-ref="HTTP_Request_configuration" path="/api/users" responseTimeout="100000">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : attributes.headers.Authorization
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"activate" : "true"
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="1570daf6-fb36-4f82-96ac-e1e5bb5fa868" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	USER_ID : payload.id,
+	FIRST_NAME: vars.original_pl.profile.firstName, 
+	LAST_NAME: vars.original_pl.profile.lastName, 
+	PHONE_NUMBER: vars.original_pl.profile.phoneNo default "", 
+	EMAIL_ID: vars.original_pl.profile.email, 
+	STATUS_TYPE_ID: if (payload.status == "ACTIVE") 1 else 0
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="ca429657-594d-481b-bf73-cbe04abd1d9a" config-ref="HTTP_Request_configuration1" path="/api/userdetails" />
+		<ee:transform doc:name="Transform Message" doc:id="dc14512e-1a26-4c26-95bc-3c489637f6f1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Registration Successfull"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="Logger" doc:id="76531514-b22a-444d-b27f-7930fcc749b5" config-ref="JSON_Logger_Config" message="Registered"/>
+	</flow>
+	<sub-flow name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="b12ca5eb-99d8-4171-b1b6-a6c76f08b9c3" >
+		<json-logger:logger doc:name="Logger" doc:id="2553fe29-724f-435b-8bdc-12beddbfb6cb" config-ref="JSON_Logger_Config" message="Update details"/>
+		<set-variable value='#[if (payload != null) payload else ""]' doc:name="Set actualPayload" doc:id="f2eebc07-0126-4ecd-a9ea-a3167b4db417" variableName="actualPayload"/>
+		<set-variable value="#[attributes.headers.Authorization]" doc:name="Set Authorization" doc:id="22e0b45a-05b7-4a6e-9641-73b66fd81cc7" variableName="Authorization"/>
+		<set-variable value="#[attributes.headers.sessionid]" doc:name="Set sessionid" doc:id="0994f6e9-35d9-4cdb-a756-3ca0ae86ee59" variableName="sessionid"/>
+		<choice doc:name="Choice" doc:id="2bbad7e0-957f-4f1a-93c6-e92ddc94acbb" >
+			<when expression="#[attributes.headers.sessionid != null]">
+				<os:retrieve doc:name="Retrieve" doc:id="a7feb991-3c11-4fae-bc16-cf40f76c664e" objectStore="Object_store" key='#[attributes.headers.sessionid]'>
+			<os:default-value><![CDATA[0]]></os:default-value>
+		</os:retrieve>
+			</when>
+			<otherwise>
+				<set-payload value="0" doc:name="Set Payload" doc:id="8c502f16-2bac-4c8c-a391-35ad85032fd5" />
+			</otherwise>
+		</choice>
+				<json-logger:logger doc:name="Logger" doc:id="877ec00f-3cea-4c73-bd91-b6b6b0728cf9" config-ref="JSON_Logger_Config" message="Update Successfull"/>
+	</sub-flow>
+	<sub-flow name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="afdeb0cd-aa2b-4ca3-be9e-e350fcba16a7" >
+		<ee:transform doc:name="Transform Message" doc:id="1922a90a-e5af-46d4-90fb-40d7865f1f12" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status : "Un-authorized"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="httpStatus" ><![CDATA[401]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<flow name="postLogin-v2" doc:id="0283d954-4663-47f1-81c4-9d95b6c66171" >
+		<!-- <http:listener doc:name="POST/login" doc:id="92e1369a-3e85-4a72-935b-662363792270" config-ref="HTTP_Listener_config" path="/login"/> -->
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="29103f81-e713-4442-bd0f-1c7dccd694fb" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="966e1615-c9c4-4067-b92b-47769ef424a0" >
+			<when expression='#[payload == "0"]'>
+				<http:request method="POST" doc:name="Request" doc:id="16e7a455-8b8a-4258-b929-8866c9086897" config-ref="HTTP_Request_configuration" path="/api/authn">
+			<http:body ><![CDATA[#[vars.actualPayload]]]></http:body>
+					<http:headers><![CDATA[#[output application/java
+---
+{
+	"Aut" : vars.Authorization
+}]]]></http:headers>
+		</http:request>
+				<http:request method="POST" doc:name="Request" doc:id="b609dcfd-a560-4c68-884b-47cf636d13bf" config-ref="HTTP_Request_configuration" path="/api/sessions">
+					<http:body ><![CDATA[#[{
+ "sessionToken":payload.sessionToken
+
+}]]]></http:body>
+					<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.Authorization
+}]]]></http:headers>
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"additionalFields" : "cookieToken"
+}]]]></http:query-params>
+				</http:request>
+				<os:store doc:name="Store" doc:id="4b2914fc-6e2c-4792-a2c8-46874b6ef030" objectStore="Object_store" key='#[payload.id]'>
+				</os:store>
+				<json-logger:logger doc:name="Logger" doc:id="a67d334f-b6a1-4e03-893e-f20f2166c3f6" config-ref="JSON_Logger_Config" message="Successfull login" />
+			</when>
+			<otherwise >
+				<json-logger:logger doc:name="Logger" doc:id="287a58f9-eb79-4923-8bfb-31d780679a4b" config-ref="JSON_Logger_Config" message="NoSessionToken"/>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="8f7dd6e8-74ea-4357-a892-94649b695480">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Logged in Successfully"
+}]]></ee:set-payload>
+			
+</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/java
+---
+
+	
+	sessionid: payload.id
+]]></ee:set-variable>
+			</ee:variables>
+		
+</ee:transform>
+	</flow>
+	<flow name="getUserinfo" doc:id="3e12866b-1036-48f0-9e36-46cef0d2b93d" >
+		<json-logger:logger doc:name="Logger" doc:id="c8a0b4b4-5c50-4e63-94bc-b2e2c425eb24" config-ref="JSON_Logger_Config" message="getuserdetails"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="f7d532c2-88bd-4fe6-a6bb-b94d43bba170" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="2d4e6941-dd54-440c-98e7-c03286c5d78e" >
+			<when expression='#[payload != "0"]'>
+				<http:request method="GET" doc:name="Request" doc:id="253332f8-cda1-4ecb-bdce-f9bb4a36bf6b" config-ref="HTTP_Request_configuration1" path="/api/user/{userid}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"userid" : payload.userId
+}]]]></http:uri-params>
+		</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="0311b117-a466-42d7-b4c4-998e300601cb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="outboundHeaders"><![CDATA[%dw 2.0
+output application/java
+---
+ sessionid: vars.sessionid]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<json-logger:logger doc:name="Logger" doc:id="22b91e3a-0bd0-47e2-936c-ec47bb97347f" config-ref="JSON_Logger_Config" message="User Details"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="83517ae3-4c0f-47c1-89bb-16d20ac405df" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="putUpdateUser-v2" doc:id="2273385c-64df-44ae-8a75-fc0d0f02129b" >
+		<!-- <http:listener doc:name="PUT/updateuser" doc:id="497b2a30-c3ea-4815-82ae-beb8b400f72c" config-ref="HTTP_Listener_config" path="/updateuser"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="d015f182-2bba-4c46-ba58-9e6c39474dc5" config-ref="JSON_Logger_Config" message="Update details"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="4a1a7a3b-d5d3-4bf1-8d82-dce792f600db" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="a8153baa-b8e5-431c-9193-6bfb7f8fdfff" >
+			<when expression='#[payload != "0"]'>
+		<http:request method="PUT" doc:name="Request" doc:id="26f7d55b-85d0-4cdf-b60b-aec3c15eee39" config-ref="HTTP_Request_configuration1" path="/api/user/{userid}/updateuser">
+			<http:body ><![CDATA[#[{
+	FIRST_NAME: vars.actualPayload.FIRST_NAME,
+	LAST_NAME: vars.actualPayload.LAST_NAME,
+	PHONE_NUMBER: vars.actualPayload.PHONE_NUMBER,
+	EMAIL_ID: payload.login,
+	STATUS_TYPE_ID: if (payload.status == "ACTIVE") 1 else 0
+}]]]></http:body>
+					<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"userid" : payload.userId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="6bed1a75-eb24-48e7-be8f-076dfc2f4bc8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Data Updated"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/java
+---
+
+	
+	sessionid: vars.sessionid
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<json-logger:logger doc:name="Logger" doc:id="3f56c219-c335-4146-8691-867b532fc45a" config-ref="JSON_Logger_Config" message="Update Successfull" />
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="1b9aa96a-9c61-4949-99ec-785d543aa723" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="postSubscription-v2" doc:id="664b6e6f-6610-475e-96bf-40fff237c4d0" >
+		<!-- <http:listener doc:name="POST/subscription" doc:id="decd30f6-3b2c-455d-b114-12009c1231b7" config-ref="HTTP_Listener_config" path="/{userid}/subscription"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="2690ea74-e08c-4f3b-b3ad-73aec14213eb" config-ref="JSON_Logger_Config" message="Subscription details"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="279717fc-35d9-4433-b04b-811ce5d6e94e" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="488954d0-751f-44cc-a4ff-178b61a646d0" >
+			<when expression='#[payload != "0"]'>
+		<set-variable value="#[payload.userId]" doc:name="Set Variable" doc:id="3ae2d1ea-bf97-4851-a9f2-4dc098d88344" variableName="userId" />
+		<ee:transform doc:name="Transform Message" doc:id="11d48d20-e8f9-4b7d-b667-3e9c6f741436" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	"STATUS_TYPE_ID":vars.actualPayload.STATUS_TYPE_ID,
+	"SOURCE_LOCATION":vars.actualPayload.SOURCE_LOCATION,
+	"DESTINATION_LOCATION":vars.actualPayload.DESTINATION_LOCATION,
+	"FROM_TIME":vars.actualPayload.FROM_TIME,
+	"TO_TIME": vars.actualPayload.TO_TIME,
+	"ADVANCE_NOTIFY_TIME_MIN":vars.actualPayload.ADVANCE_NOTIFY_TIME_MIN
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="b7cc1bb9-d97f-493e-ba09-d172fb52eab2" config-ref="HTTP_Request_configuration1" path="/api/user/{userid}/subscription">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"userid" : vars.userId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="2871819a-af06-4e47-8254-8470ba39a70e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Successfully Subscribed"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/java
+---
+
+	
+	sessionid: vars.sessionid
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="406a34cd-f632-4447-b926-1e2065f64df2" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+
+		<json-logger:logger doc:name="Logger" doc:id="8757564e-d024-4217-86dd-6016ccba611a" config-ref="JSON_Logger_Config" message="Subscribed "/>
+	</flow>
+	<flow name="putUpdateSubscription-v2" doc:id="76e862bd-efb4-49a0-9f4b-26ee2c5f4150" >
+		<!-- <http:listener doc:name="PUTupdatesubscription" doc:id="f4109f7a-9af2-4f45-b2cc-7582ccbfd008" config-ref="HTTP_Listener_config" path="/subscription/{subscriptionid}/updatesubscription"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="d95bc710-1f2d-4d94-9448-b9b7cee41b01" config-ref="JSON_Logger_Config" message="updating subscription"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="1d230c61-74b7-4350-8b1d-8db13d30b4e0" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="26984c3a-f943-419d-abd8-a19f465257c3" >
+			<when expression='#[payload != "0"]'>
+				<http:request method="PUT" doc:name="Request" doc:id="35e37ccb-57f7-4b0a-a8af-8d17244f42fc" config-ref="HTTP_Request_configuration1" path="/api/user/{userid}/subscription">
+			<http:body ><![CDATA[#[{
+	
+	"STATUS_TYPE_ID":vars.actualPayload.STATUS_TYPE_ID,
+	"SOURCE_LOCATION":vars.actualPayload.SOURCE_LOCATION,
+	"DESTINATION_LOCATION":vars.actualPayload.DESTINATION_LOCATION,
+	"FROM_TIME":vars.actualPayload.FROM_TIME,
+	"TO_TIME": vars.actualPayload.TO_TIME,
+	"ADVANCE_NOTIFY_TIME_MIN":vars.actualPayload.ADVANCE_NOTIFY_TIME_MIN
+	
+	
+}]]]></http:body>
+					<http:uri-params><![CDATA[#[{
+	userid:payload.userId
+	
+	
+}]]]></http:uri-params>
+		</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="5336932a-bea7-498b-bfda-86ce535c8e37">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Subscription updated"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+						<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/java
+---
+
+	
+	sessionid: vars.sessionid
+]]></ee:set-variable>
+			
+</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="625a22a8-6221-4dbc-81d0-71c3418079da" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+		<json-logger:logger doc:name="Logger" doc:id="a1f1ec12-7a9e-4bbb-b677-dad49dcc0124" config-ref="JSON_Logger_Config" message="subscription updated"/>
+	</flow>
+	<flow name="getSubscriptiondetails" doc:id="7f9661e3-2df8-4c1d-9f95-d5aea99fd08c" >
+		<json-logger:logger doc:name="Logger" doc:id="70784289-49f3-41eb-a6b7-60232e672d1d" config-ref="JSON_Logger_Config" message="Get Subscription details"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="98c676a2-cd9d-4724-b4b0-281ee135c7ec" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="3b0542b9-532a-4285-a89e-7fe5bf26e2b1" >
+			<when expression='#[payload != "0"]'>
+				<http:request method="GET" doc:name="Request" doc:id="5e5f08ed-0420-47c0-8e09-1651d722e0d9" config-ref="HTTP_Request_configuration1" path="/api/user/{userid}/subscription">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Key" : "Value"
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"userid" : payload.userId
+}]]]></http:uri-params>
+		</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="9e00603b-f1bf-4414-97f7-d661a4e8ab36">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="outboundHeaders"><![CDATA[%dw 2.0
+output application/java
+---
+
+ sessionid: vars.sessionid]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="a142520d-670f-42a9-b70a-fa6f23c2706f" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+		<json-logger:logger doc:name="Logger" doc:id="1c1b6c2b-aeb5-447e-a224-0736db29fa80" config-ref="JSON_Logger_Config" message="User Subscription details"/>
+	</flow>
+	<flow name="postChangePassword-v2" doc:id="9c01b0a7-fa69-4d5a-bab4-136bac4cf469" >
+		<!-- <http:listener doc:name="POST/change_password" doc:id="fb3e3357-d8a1-498d-b442-452450592b94" config-ref="HTTP_Listener_config" path="/change_password"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="895dc847-5181-4e97-8970-4300bb4d3dfe" config-ref="JSON_Logger_Config" message="changing password"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="90abbc28-7b8e-495b-9c0d-687a7445d7a9" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="9722b4ee-04d0-4228-8bdf-217d75b0d08f" >
+			<when expression='#[payload != "0"]'>
+				<ee:transform doc:name="Transform Message" doc:id="f02ab476-e260-4663-985a-bd8f914cd051">
+			<ee:message>
+			</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="chngPwdReq" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    
+    "oldPassword": { "value": vars.actualPayload.oldPassword.value  },
+    "newPassword": { "value": vars.actualPayload.newPassword.value }
+}]]></ee:set-variable>
+					</ee:variables>
+		
+</ee:transform>
+				<http:request method="POST" doc:name="Request" doc:id="73454618-01df-429f-9ca5-fe13b3927e93" config-ref="HTTP_Request_configuration" path="/api/users/{userid}/credentials/change_password">
+			<http:body ><![CDATA[#[vars.chngPwdReq]]]></http:body>
+					<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.Authorization
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"userid" : payload.userId
+}]]]></http:uri-params>
+		</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="22ff150d-8a7a-4074-b0c9-dcb413ae8343">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Password changed"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="outboundHeaders"><![CDATA[%dw 2.0
+output application/java
+---
+
+	
+	sessionid: vars.sessionid
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="fad5e122-631e-440a-8da8-8811b820f637" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+		<json-logger:logger doc:name="Logger" doc:id="d57aead2-13cb-4ce5-99f2-12efd1cb49f0" config-ref="JSON_Logger_Config" message="password changed"/>
+	</flow>
+	<flow name="postRecoveryPassword-v2" doc:id="850c666a-2bab-458e-afd2-21c9c7b79c2b" >
+		<!-- <http:listener doc:name="POST/recoverypassword" doc:id="ea2f9849-3115-41ea-9ebc-a37d1cb148b6" config-ref="HTTP_Listener_config" path="/recoverypassword"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="0218719d-a72a-45bb-af74-01c8e0691b4c" config-ref="JSON_Logger_Config" message="Reset Password"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="75ece448-c9d0-40b7-beb7-cfd4dce31c11" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="96a12cc4-04be-4ce5-a95f-481ed621f7f0" >
+			<when expression='#[payload != "0"]'>
+				<ee:transform doc:name="Transform Message" doc:id="8f9ed3b0-85db-4f2f-95e1-6a27d83d9ba1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+    username:vars.actualPayload.username,
+    factorType:vars.actualPayload.factorType,
+    relayState:vars.actualPayload.relayState
+ }
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<http:request method="POST" doc:name="Request" doc:id="1566fa61-389d-43bc-8b63-8e05eb850143" config-ref="HTTP_Request_configuration" path="/api/authn/recovery/password">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.Authorization
+}]]]></http:headers>
+		</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="f5ed93f7-f19b-4ad0-ba72-c83d1eea382c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Password Reset link sent to Email"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="outboundHeaders"><![CDATA[%dw 2.0
+output application/java
+---
+
+	
+	sessionid: vars.sessionid
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="b6642962-d8e0-4f24-bff6-68306d2da994" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+		<json-logger:logger doc:name="Logger" doc:id="7b535be3-25f6-4c30-a5a9-8cb2f3c9ed2c" config-ref="JSON_Logger_Config" message="Password Recovered"/>
+	</flow>
+	<flow name="DELETELogOut-v2" doc:id="b4129643-30ba-4870-b374-79f0ec0f417a" >
+		<http:listener doc:name="DELETE/logout" doc:id="06f364a9-1e46-43e0-93f0-e61d972753f7" config-ref="HTTP_Listener_config" path="/logout"/>
+		<json-logger:logger doc:name="Logger" doc:id="375296b9-daa3-488c-81d6-0e21f9650794" config-ref="JSON_Logger_Config" message="logging out"/>
+		<flow-ref doc:name="my-trains-exp-objectstore-v2-Sub_Flow" doc:id="afb7696e-7ee5-4bd6-a7f5-cd312b8781a0" name="my-trains-exp-objectstore-v2-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="c0826656-28fb-40e5-925e-b40263c009b5" >
+			<when expression='#[payload != "0"]'>
+				<http:request method="DELETE" doc:name="Request" doc:id="fc8cecf4-89bb-49da-8f0d-24c73a5c4c72" config-ref="HTTP_Request_configuration" path="/api/sessions/{sessionid}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.Authorization
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"sessionid" : vars.sessionid
+}]]]></http:uri-params>
+		</http:request>
+				<os:remove doc:name="Remove" doc:id="1ede6e39-63c2-42d2-a99b-2a32343ac0a8" objectStore="Object_store" key="#[vars.sessionid]" />
+				<ee:transform doc:name="Transform Message" doc:id="e9f405ad-3f85-4957-8965-6add170a1e3b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "logged out successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="my-trains-exp-v2-unauth-Sub_Flow" doc:id="6060197a-e61a-4161-bb8d-14496b3ee118" name="my-trains-exp-v2-unauth-Sub_Flow"/>
+			</otherwise>
+		</choice>
+		<json-logger:logger doc:name="Logger" doc:id="9b128b0a-d659-466e-a51a-4d2cd4ca25e0" config-ref="JSON_Logger_Config" message="logged out"/>
+	</flow>
+</mule>

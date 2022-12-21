@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_b0a11895_4d37_435d_b98b_d07d4f8e1e9f_Input_Payload = {
+  NOTIFICATION_FAILURE_DETAIL: String, 
+  DELAY_TYPE_FLAG: String, 
+  DELAY_TIME: Number, 
+  NOTIFICATION_STATUS: String, 
+  ALERT_TRANSACTION_ID: Number, 
+  _?: Any
+} {"label": "Alerts"}
+

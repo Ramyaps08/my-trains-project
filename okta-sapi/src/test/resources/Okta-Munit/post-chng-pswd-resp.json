@@ -1,0 +1,7 @@
+{
+    "password": {},
+    "provider": {
+        "type": "OKTA",
+        "name": "OKTA"
+    }
+}

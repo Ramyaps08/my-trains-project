@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="soaprequest" format="json">
+      <types:shape format="weave" example="examples/SOAPbody.json"><![CDATA[%dw 2.0
+
+type soaprequest = {|
+  AccessToken: {| TokenValue: String |}, 
+  GetArrBoardWithDetailsRequest: {|
+    numRows: String, 
+    crs: String, 
+    filterCrs: String, 
+    filterType: String, 
+    timeOffset: String, 
+    timeWindow: String
+  |}
+|} {"example": "{\\\"AccessToken\\\":{\\\"TokenValue\\\":\\\"86cdc061-3f79-46b1-aee9-b1cccfd4ef5f\\\"},\\\"GetArrBoardWithDetailsRequest\\\":{\\\"numRows\\\":\\\"40\\\",\\\"crs\\\":\\\"BSK\\\",\\\"filterCrs\\\":\\\"WAT\\\",\\\"filterType\\\":\\\"to\\\",\\\"timeOffset\\\":\\\"0\\\",\\\"timeWindow\\\":\\\"120\\\"}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#02bd20c6-4000-45d4-a055-64940d1c84b6"/>
+</types:mule>

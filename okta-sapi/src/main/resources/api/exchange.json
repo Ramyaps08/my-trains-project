@@ -1,0 +1,1 @@
+{"main":"mytrains-okta-sapi.raml","name":"MyTrains-Okta-SAPI","classifier":"raml","tags":[],"dependencies":[{"groupId":"a6a89936-028e-4081-b802-1965f45926ed","assetId":"okta-api-fragment","version":"1.0.3"}]}

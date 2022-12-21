@@ -1,0 +1,1 @@
+{"main":"mytrains-mysql-api.raml","name":"MyTrains-Mysql-API","classifier":"raml","tags":[],"dependencies":[{"groupId":"a6a89936-028e-4081-b802-1965f45926ed","assetId":"mysql-fragment-api","version":"1.0.4"}]}

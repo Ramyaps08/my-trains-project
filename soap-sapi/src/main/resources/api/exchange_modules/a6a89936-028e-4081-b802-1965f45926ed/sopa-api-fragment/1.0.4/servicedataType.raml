@@ -1,0 +1,105 @@
+#%RAML 1.0 DataType
+type: object
+additionalProperties: false
+properties:
+  sta:
+    type: string
+    required: false
+  eta:
+    type: string
+    required: false
+  std:
+    type: string
+    required: false
+  etd:
+    type: string
+    required: false
+  platform:
+    type: string
+    required: false  
+  operator:
+    type: string
+    required: true
+  operatorCode:
+    type: string
+    required: true
+  isCircularRoute:
+    type: boolean
+    required: false
+  isCancelled:
+    type: boolean
+    required: false
+  filterLocationCancelled:
+    type: boolean
+    required: false
+  serviceType: 
+    type: string
+    required: true
+  length:
+    type: number
+    required: false
+  detachFront:
+    type: string
+    required: false
+  isReverseFormation:
+    type: string
+    required: false
+  cancelledReason:
+    type: string
+    required: false
+  delayReason:
+    type: string
+    required: false
+  serviceID:
+    type: string
+    required: true
+  adhocAlerts:
+    type: array
+    required: false
+    items:
+      type: object
+      properties:
+        adhocAlertText:
+          type: string
+          required: false
+  rsid:
+    type: string
+    required: false
+  origin:
+    type:  !include locationdataType.raml
+    required: false
+  destination:
+    type:  !include locationdataType.raml
+    required: false
+  currentOrigins:
+    type:  !include locationdataType.raml
+    required: false
+  currentDestinations:
+    type:  !include locationdataType.raml
+    required: false
+  formation:
+    type: object
+    required: false
+    properties:
+      avgLoading:
+        type: string
+        required: false
+      coaches:
+        type: array
+        required: true
+        items:
+          type: object
+          properties:
+            coachId:
+              type: string
+              required: true
+            coachClass:
+              type: string
+              required: false
+            toiletStatus:
+              type: string
+              required: false
+            loading:
+              type: string
+              required: false
+      

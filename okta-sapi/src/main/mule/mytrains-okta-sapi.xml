@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="mytrains-okta-sapi-config" api="mytrains-okta-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="mytrains-okta-sapi-main" doc:id="77c9081a-1f6d-477e-8e22-2dff20fa1c48">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="mytrains-okta-sapi-config" />
+		<error-handler ref="global-error-handler" />
+        
+    </flow>
+    <flow name="mytrains-okta-sapi-console" doc:id="116732fc-b3ce-4b47-ba7c-8084b9f47ed6">
+        <http:listener config-ref="HTTP_Listener_config" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="mytrains-okta-sapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="delete:\sessions\(sessionid):mytrains-okta-sapi-config" doc:id="c710ec8e-1cba-4f1e-ad54-78607906a3ec">
+		<flow-ref doc:name="deleteSessions" doc:id="5ae24f58-566a-49cd-895c-dd559ef09d0a" name="deleteSessions"/>
+    </flow>
+    <flow name="get:\sessions\(sessionid):mytrains-okta-sapi-config" doc:id="175bed5d-fe6d-4263-b924-4aae0cd9a4bb">
+		<flow-ref doc:name="getValidatesession" doc:id="9291345d-f20f-4ff0-8b82-adb568c4d697" name="getValidatesession"/>
+    </flow>
+    <flow name="post:\authn\recovery\password:application\json:mytrains-okta-sapi-config" doc:id="bfb5859c-eae0-46f3-9a6c-0657abae26e6">
+		<flow-ref doc:name="postForgotPassword" doc:id="c6c6c656-7702-463e-88ce-cf5b5d11558d" name="postForgotPassword"/>
+    </flow>
+    <flow name="post:\authn:application\json:mytrains-okta-sapi-config" doc:id="ac03dbd4-2a0f-43d4-b112-7c917314fd86">
+		<flow-ref doc:name="PostAuthn" doc:id="e55d2e15-3785-41a6-a85f-a46c219be208" name="PostAuthn"/>
+    </flow>
+    <flow name="post:\sessions:application\json:mytrains-okta-sapi-config" doc:id="6227eacf-02a7-4f6a-8efd-73afa97621b4">
+		<flow-ref doc:name="PostSessions" doc:id="9ccf7ffe-37ed-42cc-89be-20c2f4503a56" name="PostSessions"/>
+    </flow>
+    <flow name="post:\users\(userid)\credentials\change_password:application\json:mytrains-okta-sapi-config" doc:id="74ff283f-b8cb-4705-a8a9-ab0d11cc433e">
+		<flow-ref doc:name="Postchangepassword" doc:id="074cb4d8-523a-4912-b342-d1a1340e141b" name="Postchangepassword"/>
+    </flow>
+    <flow name="post:\users:application\json:mytrains-okta-sapi-config" doc:id="68a6a7d1-c5e8-4154-900a-6526f2ad4a16">
+		<flow-ref doc:name="PostUsers" doc:id="bb171eab-9931-40ca-9ecb-5ae5f467ed29" name="PostUsers"/>
+    </flow>
+</mule>

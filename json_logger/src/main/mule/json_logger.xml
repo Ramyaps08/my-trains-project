@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="fbaa8235-e6c5-45d6-b735-94f45f95185c" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="964cc8f5-01d3-494e-b912-08ac157a6d14" environment="${mule.env}"/>
+	<global-property doc:name="Global Property" doc:id="fe5575b7-81ec-4293-8032-3d05c144f97a" name="mule.env" value="dev" />
+	<global-property doc:name="Global Property" doc:id="4b44e2f5-47d2-4346-9272-695737f36e47" name="json.logger.application.name" value="JsonLogger" />
+	<global-property doc:name="Global Property" doc:id="624e4734-57d8-4489-ad73-ed36f7c77aca" name="json.logger.application.version" value="1" />
+	<flow name="postJsonLogger" doc:id="fa62b79b-f3c8-4cc8-ac0f-2bd4fc1317ff" >
+		<http:listener doc:name="Post/jsonlogger" doc:id="ae2fcdbd-b2ff-49e9-9a6b-9bdf6768d55e" path="/jsonlogger" config-ref="HTTP_Listener_config"/>
+		<set-payload value="Logger is working properly" doc:name="Set Payload" doc:id="e7173d85-1571-49b5-9335-90696e3cf31d" />
+		<json-logger:logger doc:name="Logger" doc:id="81d6410a-8c6e-42f3-9f9d-8caccb86a1b4" config-ref="JSON_Logger_Config" message="Working"/>
+	</flow>
+</mule>

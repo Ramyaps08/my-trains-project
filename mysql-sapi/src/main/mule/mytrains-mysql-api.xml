@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="mytrains-mysql-api-config" api="mytrains-mysql-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="mytrains-mysql-api-main">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="mytrains-mysql-api-config" />
+        <error-handler ref="global-error-handler">
+            
+
+        </error-handler>
+    </flow>
+    <flow name="mytrains-mysql-api-console" doc:id="2b1d1f66-da9d-46f7-b293-5fdfad9b41f9">
+        <http:listener config-ref="HTTP_Listener_config" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="mytrains-mysql-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\user\(userid)\subscription:application\json:mytrains-mysql-api-config" doc:id="8afc757b-ffda-440d-aa99-621f7fdc604e">
+		<flow-ref doc:name="putupdateSubscription" doc:id="7b8eb7f7-630b-4b61-82c0-045f370f9069" name="putupdateSubscription"/>
+    </flow>
+    <flow name="put:\user\(userid)\updateuser:application\json:mytrains-mysql-api-config" doc:id="652665ec-955e-44cd-9674-9481ac05d5ab">
+		<flow-ref doc:name="putUpdateUser" doc:id="1527efdf-9258-4db0-8854-056126a403e9" name="putUpdateUser"/>
+    </flow>
+    <flow name="get:\subscribedusers:mytrains-mysql-api-config" doc:id="168c30d8-9c04-4d71-8bf1-c0cf74156307">
+		<flow-ref doc:name="Flow Reference" doc:id="1c985bb0-1748-4893-a65a-f87398f23767" name="getSubscribedusers"/>
+    </flow>
+    <flow name="get:\user\(userid):mytrains-mysql-api-config" doc:id="12f0e82c-827f-4ed5-9c3e-c655503316fc">
+		<flow-ref doc:name="getuseruserid" doc:id="f5e7e843-d859-450a-9a80-92f990fe5a82" name="getuseruserid"/>
+    </flow>
+    <flow name="get:\user\(userid)\subscription:mytrains-mysql-api-config" doc:id="5bd912df-ab06-4199-bbbb-4141266cf5c5">
+		<flow-ref doc:name="Flow Reference" doc:id="028d1c9c-943c-419c-8ae9-e97764dc2546" name="getViewSubscription"/>
+    </flow>
+    <flow name="get:\users\subscription:mytrains-mysql-api-config">
+		<flow-ref doc:name="getSubscribedusers" doc:id="f8d4290b-9d31-4904-9ea5-392e1d18c5d7" name="getSubscribedusers"/>
+    </flow>
+    <flow name="post:\alerts:application\json:mytrains-mysql-api-config" doc:id="3de8a37d-73db-4311-8a97-ec5de89c8bc9">
+		<flow-ref doc:name="Flow Reference" doc:id="351c3878-b5d2-4dd5-86d0-5cddd0aa334f" name="postAlerts"/>
+    </flow>
+    <flow name="post:\user\(userid)\subscription:application\json:mytrains-mysql-api-config" doc:id="b04a5e9e-b400-47a1-8b19-e95494156acd">
+		<flow-ref doc:name="Flow Reference" doc:id="29775e5e-023b-41b0-837a-ad78468f5546" name="postSubscription"/>
+    </flow>
+    <flow name="post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="9aabb734-9473-4060-87b6-ccea57c703f2">
+		<flow-ref doc:name="postUserDetails" doc:id="3c8a7c5c-c780-4de3-a9cd-1b2669361b3b" name="postUserDetails"/>
+    </flow>
+</mule>

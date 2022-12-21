@@ -1,0 +1,28 @@
+{
+    "expiresAt": "2022-11-23T03:09:33.000Z",
+    "status": "SUCCESS",
+    "sessionToken": "20111FBKdriDv6QYCYQ58dVXhwh28lIxPa-wNvW2g0A4vsV2sGKu9EA",
+    "_embedded": {
+        "user": {
+            "id": "00u7d5b540WePm8is5d7",
+            "passwordChanged": "2022-11-23T01:47:05.000Z",
+            "profile": {
+                "login": "iNamitaB@gmail.com",
+                "firstName": "Namita",
+                "lastName": "Brock",
+                "locale": "en_US",
+                "timeZone": "America/Los_Angeles"
+            }
+        }
+    },
+    "_links": {
+        "cancel": {
+            "href": "https://dev-63431661.okta.com/api/v1/authn/cancel",
+            "hints": {
+                "allow": [
+                    "POST"
+                ]
+            }
+        }
+    }
+}

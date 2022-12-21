@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e500e574-0d84-4580-9cc7-eb00eeda031f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="0b0a02db-6878-4db3-85e1-29d30d27aab1" >
+		<salesforce:basic-connection username="rsikhapalli@gmail.com" password="RPS@2981" securityToken="gHjqeqIyirUKkzAJQfRIE7LFr"/>
+	</salesforce:sfdc-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="69d4dcd8-ca1c-46c2-ad54-2b3632017905" responseTimeout="1000000">
+		<http:request-connection host="localhost" port="8091" />
+	</http:request-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="ebf3ad28-1964-47f1-a79d-9b55831611a5" environment="${mule.env}" />
+	<global-property doc:name="Global Property" doc:id="3eab8fa8-5ab7-4a2a-8a53-e9ec53e4d2e1" name="json.logger.application.name" value="logger"/>
+	<global-property doc:name="Global Property" doc:id="1d789f83-6b3a-4bf4-bfc1-b59fe2c21193" name="json.logger.application.version" value="3" />
+	<global-property doc:name="Global Property" doc:id="6d522c64-f8f1-4bac-961f-a93ae0c318ee" name="mule.env" value="dev" />
+	<flow name="postSyncDetails" doc:id="2638c12c-b354-4fc9-9681-89e6f54bc37a" >
+		<scheduler doc:name="Scheduler" doc:id="ef5b3cdb-fbef-445b-b30f-1816d117f35f" >
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</scheduler>
+		<json-logger:logger doc:name="Logger" doc:id="43ee1314-5888-4f0c-8f01-5e15517c6f5c" config-ref="JSON_Logger_Config" message="Sync with Salesforce"/>
+		<http:request method="GET" doc:name="Request" doc:id="7e5a90b8-55ca-4450-9d4c-67132191e6a8" config-ref="HTTP_Request_configuration" path="/api/subscribedusers"/>
+		<ee:transform doc:name="Transform Message" doc:id="1662e1b6-9986-4ff3-a7d5-cad9c7ef0495" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map {
+    
+	LastName: $.LAST_NAME,
+	FirstName: $.FIRST_NAME,
+	MobilePhone: $.PHONE_NUMBER,
+	Email: $.EMAIL_ID
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="7a4c3f09-1635-482e-9360-1be7a6cfe766" collection="#[payload]" batchSize="200">
+			<ee:transform doc:name="Transform Message" doc:id="b9315e98-f60d-4994-8c27-0c0df8c14f1a" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ($)]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<salesforce:upsert doc:name="Upsert" doc:id="d31ee613-ed91-46cb-8f80-a22fa3e304e7" config-ref="Salesforce_Config" objectType="Contact" readTimeoutUnit="DAYS" externalIdFieldName="Email"/>
+			<logger level="INFO" doc:name="Logger" doc:id="5cf05102-bfb6-48ab-a9bd-0df5def95ade" message="#[payload]"/>
+		</foreach>
+		<json-logger:logger doc:id="890a55d3-1e21-44b9-936c-db94d5c5e752" config-ref="JSON_Logger_Config" message="Syncing with Salesforce"/>
+	</flow>
+</mule>

@@ -1,0 +1,14 @@
+%dw 2.0
+
+type auto_9c01b0a7_fa69_4d5a_bab4_136bac4cf469_Input_Payload = {
+  oldPassword: {
+    value: String, 
+    _?: Any
+  } {"label": "oldPassword"}, 
+  newPassword: {
+    value: String, 
+    _?: Any
+  } {"label": "newPassword"}, 
+  _?: Any
+} {"label": "Change Password"}
+

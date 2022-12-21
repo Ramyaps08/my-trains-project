@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_38dcd652_307c_4d60_90da_f6243664af22_Output_Payload = {
+  ADVANCE_NOTIFY_TIME_MIN: Number, 
+  STATUS_TYPE_ID: Number, 
+  SOURCE_LOCATION: String, 
+  FROM_TIME: String, 
+  TO_TIME: String, 
+  DESTINATION_LOCATION: String, 
+  _?: Any
+} {"label": "Add Subscription"}
+

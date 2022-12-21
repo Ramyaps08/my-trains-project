@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_850c666a_2bab_458e_afd2_21c9c7b79c2b_Input_Payload = {
+  relayState: String, 
+  factorType: String, 
+  username: String, 
+  _?: Any
+} {"label": "ForgotPassword"}
+

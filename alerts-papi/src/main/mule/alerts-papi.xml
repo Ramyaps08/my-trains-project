@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<!-- <email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="4e03b41e-90b2-4694-95fc-ae64d0d536f8" subject="[No Subject]" config-ref="Email_SMTP" attachmentsContentTransferEncoding="Base64" > 
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="rsikhapalli@gmail.com" password="Alldbest@81" />
+	</email:smtp-config>-->
+<!-- 	<email:imap-config name="Email_IMAP">
+  <email:imaps-connection host="imap.gmail.com"
+    port="995" user="user@gmail.com"
+    password="mypassword">
+    <tls:context>
+        <tls:trust-store insecure="true"/>
+    </tls:context>
+  </email:imaps-connection>
+</email:imap-config> -->
+<!-- <email:pop3-config name="Email_POP3">
+    <email:pop3s-connection host="pop.gmail.com"
+      port="995"  user="user@gmail.com"
+      password="Gmailpassword">
+        <tls:context>
+            <tls:trust-store insecure="true"/>
+        </tls:context>
+    </email:pop3s-connection>
+</email:pop3-config> -->
+<!-- <email:smtp-config name="Email_SMTP_Mule" from="rsikhapalli@gmail.com">
+    <email:smtps-connection host="smtp.gmail.com"
+      password="Alldbest@81"
+      user="rsikhapalli@gmail.com">
+        <tls:context enabledProtocols="TLSv1.1, TLSv1.2">
+            <tls:trust-store insecure="true"/>
+        </tls:context>
+    </email:smtps-connection>
+</email:smtp-config> -->
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="7ab8c625-a751-404f-acbe-0e6119bb29fa" >
+		<email:smtp-connection host="smtp.gmail.com" user="rsikhapalli@gmail.com" password="Alldbest@81" port="465">
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="aa4347b2-c7d3-4788-98ff-810d47d020e9" environment="${mule.env}" />
+	<global-property doc:name="Global Property" doc:id="03158d06-9fc5-4532-b626-0c897e06b380" name="json.logger.application.name" value="json logger" />
+	<global-property doc:name="Global Property" doc:id="1d800784-1828-4899-817d-2159a22d0007" name="json.logger.application.version" value="2" />
+	<global-property doc:name="Global Property" doc:id="f6145ba8-d756-4b2f-a302-4479dd3e3714" name="mule.env" value="dev" />
+	<flow name="alerts-papiFlow" doc:id="11cef6b9-5e62-46ed-942e-1d58c6ca4fe2" >
+		<http:listener doc:name="/alertsinfo" doc:id="75bb23e0-ab46-4898-ab7b-0558199c907d" path="/alertsinfo" config-ref="HTTP_Listener_config"/>
+		<json-logger:logger doc:name="Logger" doc:id="45a6af6c-38a1-42af-97b7-d314f0879d52" config-ref="JSON_Logger_Config" message="alert notification"/>
+		<http:request method="POST" doc:name="Request" doc:id="158e76c9-fc17-4457-a7b4-e397ba23f7a6" config-ref="HTTP_Request_configuration" path="/api/boarddetails">
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="02bd20c6-4000-45d4-a055-64940d1c84b6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="payload" doc:name="Set Payload" doc:id="5b3c876a-a497-4ed3-8309-fa43aef9732c" mimeType="text/html"/>
+		<json-logger:logger doc:id="11f81fc7-7ca9-42d9-91a5-39094780652c" config-ref="JSON_Logger_Config" message="alerts sent"/>
+		<email:send doc:name="Send" doc:id="1d6c8124-e1a4-4236-a3b6-4aa70a114681" config-ref="Email_SMTP" fromAddress="rsikhapalli@gmail.com" subject="[Test email]">
+			<email:to-addresses >
+				<email:to-address value="akruparao@gmail.com" />
+			</email:to-addresses>
+			<email:body >
+				<email:content ><![CDATA[test email from Mule]]></email:content>
+			</email:body>
+		</email:send>
+	</flow>
+</mule>

@@ -1,0 +1,38 @@
+%dw 2.0
+
+type auto_9752431f_a367_4509_a394_7da175c4ad83_Output_Payload = {|
+  GetStationBoardResult?: {
+    filterLocationName?: String, 
+    locationName: String, 
+    crs: String, 
+    generatedAt: String, 
+    nrccMessages?: Array<{      message?: String,       _?: Any    }>, 
+    filtercrs?: String, 
+    areServicesAvailable?: Boolean, 
+    filterType?: String, 
+    trainServices?: Array<{|      serviceType: String,       isReverseFormation?: String,       sta?: String,       std?: String,       isCancelled?: Boolean,       detachFront?: String,       filterLocationCancelled?: Boolean,       currentOrigins?: {|        crs: String,         futureChangeTo?: String,         assocIsCancelled?: Boolean,         LocationName: String,         via?: String      |},       origin?: {|        crs: String,         futureChangeTo?: String,         assocIsCancelled?: Boolean,         LocationName: String,         via?: String      |},       isCircularRoute?: Boolean,       length?: Number,       destination?: {|        crs: String,         futureChangeTo?: String,         assocIsCancelled?: Boolean,         LocationName: String,         via?: String      |},       rsid?: String,       formation?: {        coaches: Array<{          coachClass?: String,           loading?: String,           coachId: String,           toiletStatus?: String,           _?: Any        }>, 
+        avgLoading?: String, 
+        _?: Any
+      }, 
+      operatorCode: String, 
+      adhocAlerts?: Array<{        adhocAlertText?: String,         _?: Any      }>, 
+      currentDestinations?: {|
+        crs: String, 
+        futureChangeTo?: String, 
+        assocIsCancelled?: Boolean, 
+        LocationName: String, 
+        via?: String
+      |}, 
+      platform?: String, 
+      operator: String, 
+      eta?: String, 
+      etd?: String, 
+      delayReason?: String, 
+      serviceID: String, 
+      cancelledReason?: String
+    |}>, 
+    platformAvailable?: String, 
+    _?: Any
+  }
+|}
+

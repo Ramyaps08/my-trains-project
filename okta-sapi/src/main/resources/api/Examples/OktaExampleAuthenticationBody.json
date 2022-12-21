@@ -1,0 +1,8 @@
+{
+  "username": "iNamitaB@gmail.com",
+  "password": "DoitNow@13",
+  "options": {
+    "multiOptionalFactorEnroll": true,
+    "warnBeforePasswordExpired": true
+  }  
+}

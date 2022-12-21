@@ -1,0 +1,12 @@
+ {
+  "AccessToken": {
+    "TokenValue": "86cdc061-3f79-46b1-aee9-b1cccfd4ef5f"
+  },"GetArrBoardWithDetailsRequest": {
+    "numRows": "40",
+    "crs": "ABW",
+    "filterCrs": "MIA",
+    "filterType": "to",
+    "timeOffset": "0",
+    "timeWindow": "120"
+  }
+}

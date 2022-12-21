@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<munit:config name="okta-sapi-test-suite.xml" />
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="772b48b6-cbf6-4359-a3c7-6919be7767a9" responseTimeout="300000">
+		<http:request-connection host="localhost" port="8081" usePersistentConnections="false"/>
+	</http:request-config>
+	<munit:test name="okta-sapi-test-suite-PostUsersTest" doc:id="784df241-b8fe-45bb-8b99-49185cc52f39" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock PostUsers" doc:id="59ac528c-128f-4c2f-a0e6-5df57adb948f" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-post-users" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="115d17a8-4bfa-4e5f-8122-e8e777fecdb1" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\users:application\json:mytrains-okta-sapi-config" doc:id="83661bff-3cf1-4929-86f3-d8d0617fac62" name="post:\users:application\json:mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="0cc42b9a-f157-41ac-a5d1-7d24c17ffcaf" is="#[MunitTools::notNullValue()]" expression="#[payload.id]" />
+			<munit-tools:assert-equals doc:name="Assert equals Id" doc:id="d371b09b-5bde-426c-936c-44b5162b8919" actual="#[payload.id]" expected="00u7dn9fffrMy25635d7"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-HTTP:CONNECTIVITY" doc:id="a229ec08-6d8f-45d1-b8ea-1fe7ed0e5138" description="Test" expectedErrorType="HTTP:CONNECTIVITY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock PostUsers" doc:id="7d46f74b-12bf-4c67-a368-12bf4879b9d6" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-post-users" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="eeb16154-87c4-410f-b890-85f54337f28b" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PostUsers" doc:id="61d1d075-ae0a-4804-87e0-3e9e219750ca" name="PostUsers"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-APIKIT:BAD_REQUEST" doc:id="137f6964-4417-4a94-ad18-26bf11d38cb0" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e6787bc2-f403-4455-81a9-0afae5420bcf" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="85ee97ed-5662-4b7d-b906-58b281abce90" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="InvokeServiceNow" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="c3ddbc5b-6da7-4ed6-82e0-12e7de251477" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="0a6e99b7-662a-4dbd-93d4-620da33d5050" name="mytrains-okta-sapi-main"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-APIKIT:METHOD_NOT_ALLOWED" doc:id="94e40603-5798-4169-80dd-52091d33fbb6" description="Test" expectedErrorType="APIKIT:METHOD_NOT_ALLOWED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="473ca241-7537-4fab-96b2-a34858cc39c9" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="67663bd1-e99b-4170-8faf-0a03da911804" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="c60cfe1d-e5e1-4a04-9912-f2e49499385b" name="mytrains-okta-sapi-main"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-APIKIT:NOT_ACCEPTABLE" doc:id="fbaa4ea2-d36d-405f-a554-ecab578b783b" description="Test" expectedErrorType="APIKIT:NOT_ACCEPTABLE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="955951c7-8300-46cd-9c75-a85f35816ef8" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="5cc381e5-6382-4359-ab4c-8465e4d817b3" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="ca743d05-cb15-4231-9ffd-5909227d5089" name="mytrains-okta-sapi-main"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="b94f346c-1fc5-4366-aee9-644b8c4e5d6b" description="Test" expectedErrorType="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="597ad8d0-28bb-4d86-b828-c1d060e7933a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="212e3826-e381-4061-837d-bb46971eb998" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="54a5706e-de3f-4931-89d1-fe8ac500d675" name="mytrains-okta-sapi-main"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-APIKIT:NOT_IMPLEMENTED" doc:id="653c27dd-426d-4057-bf01-9160d10cf61c" description="Test" expectedErrorType="APIKIT:NOT_IMPLEMENTED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="adb8edf9-7ccb-452e-9b16-b4f5d95cf11d" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="5eab3cb6-1fb3-4b1a-a536-618223c52ca5" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="2ed46144-9a5e-4406-88c1-b783c01d0b6b" name="mytrains-okta-sapi-main"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-PostUsersTest-APIKIT:NOT_FOUND" doc:id="7d26cd60-feca-4138-a21a-677364cf639b" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d6dace4f-e23e-4e58-85a5-ecb856e97e20" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="10fafbc3-b9ea-40ee-b188-6ca860969085" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="9ebab576-4e82-4c7f-a5f9-ae52c25cb875" name="mytrains-okta-sapi-main"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-console-APIKIT:NOT_FOUND" doc:id="9428c3a9-4443-49c0-bf9c-3830fda34252" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0c9b6dc8-d3dd-4dfd-a9d6-d8176be26cd8" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-okta-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f66c7c6e-9222-496d-84c9-f88a2d6bbbe1" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-user-req.json")]' mediaType="application/json" />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-okta-sapi-main" doc:id="c494a782-5c5c-4aed-b57a-ace08160f8ca" name="mytrains-okta-sapi-console"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-test-suite-PostchangepasswordTest" doc:id="f4118343-1311-4bde-8143-ee01e841c293" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Postchangepassword" doc:id="9a1fde8b-f215-4471-ab06-7fe69806088c" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-post-chng-pswd" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-chng-pswd-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a2cd3712-9f08-4390-b2be-70e56b7f0fea" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-chng-pswd-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\users\(userid)\credentials\change_password:application\json:mytrains-okta-sapi-config" doc:id="ca08257a-3805-4abd-84b0-3ca5f1428592" name="post:\users\(userid)\credentials\change_password:application\json:mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ba4f28f9-9216-4808-b69a-be4efb2383e7" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="okta-sapi-test-suite-postForgotPasswordTest" doc:id="348cbe5a-8c38-49f4-995a-0cd8ed3f20c3" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock postForgotPassword" doc:id="2465bfbc-945b-4936-a10d-d2ca36708196" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-post-fgt-pswd" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-fgt-pswd-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="7102284b-cb7b-41b2-a440-ff38a3f90aa5" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-fgt-pswd-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\authn\recovery\password:application\json:mytrains-okta-sapi-config" doc:id="e46ca4a7-35a1-481d-8a96-a9870620aff1" name="post:\authn\recovery\password:application\json:mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="02246d46-568c-4d20-af9c-d36bb43c0b0f" expression="#[payload.recoveryType]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="3f115411-275e-4f0f-b947-ba15ccdcbe2d" actual="#[payload.recoveryType]" expected="PASSWORD"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="okta-sapi-test-suite-PostAuthnTest" doc:id="f40db8db-c6f3-4dcb-96e0-de6a24bdf3f2" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="MockPostAuthn" doc:id="c6c98663-a6e8-4345-b8a9-eaa664acd281" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-post-authn" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-authn-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8a791f17-02e6-47ba-81c7-c4471fc265aa" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-authn-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\authn:application\json:mytrains-okta-sapi-config" doc:id="49693b82-6407-453c-9baf-2ce8f758e301" name="post:\authn:application\json:mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="46119fdd-a9d8-436c-a2f8-6bbd4bec5619" expression="#[payload.sessionToken]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals sessionToken" doc:id="34425e83-6ed7-436e-a67e-befc35a2aa47" actual="#[payload.sessionToken]" expected="20111FBKdriDv6QYCYQ58dVXhwh28lIxPa-wNvW2g0A4vsV2sGKu9EA"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="okta-sapi-test-suite-PostSessionsTest" doc:id="1450b340-d54e-4439-b15b-f595b01a0874" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock PostSessions" doc:id="e0e657a9-2b2f-4bb8-a307-503c758c8859" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-post-sessions" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-sessions-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="244340af-b743-4c4f-b53a-993cb10bbeeb" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/post-sessions-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\sessions:application\json:mytrains-okta-sapi-config" doc:id="a83ddad2-5ed3-473f-87cb-ca1f99f7af04" name="post:\sessions:application\json:mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="3a608814-2c8f-4663-83b4-a2b53a1ad5f3" expression="#[payload.id]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals id" doc:id="a9d7d856-f975-4e11-9581-302b819254ae" actual="#[payload.id]" expected="102myl290q6QciNuZj5XgXpEA"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="okta-sapi-test-suite-getValidatesessionTest" doc:id="b5b435c7-16c5-4f8a-899f-953cedc4adb6" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock getValidatesession" doc:id="2938c725-e329-489a-8abc-bb6d6536ae32" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-get-validate-session" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://Okta-Munit/get-validate-sessions-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\sessions\(sessionid):mytrains-okta-sapi-config" doc:id="c58877aa-d80a-480f-ade6-2a2ea72d5295" name="get:\sessions\(sessionid):mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="7880d008-6c99-4b40-b91f-2fd51506f482" expression="#[payload.id]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals id" doc:id="7feb7912-52d3-4bec-88dc-1fb99b48b15c" actual="#[payload.id]" expected="102myl290q6QciNuZj5XgXpEA"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="okta-sapi-test-suite-deleteSessionsTest" doc:id="769f8dd0-d863-4b76-adda-b2c30e57f5fa" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock deleteSessions" doc:id="47467c80-a5ae-403d-83c3-7601210db7f3" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-delete-sessions" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to delete:\sessions\(sessionid):mytrains-okta-sapi-config" doc:id="43791bb4-2196-4856-96f6-f3ff8deae3dc" name="delete:\sessions\(sessionid):mytrains-okta-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="d69ec35d-cd5e-4f00-8c86-87a92beb7f50" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4e37af83-6eb1-41ad-8083-d4d475d38a30" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

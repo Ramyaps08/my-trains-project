@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd">
+	<servicenow:config name="ServiceNow_Config" doc:name="ServiceNow Config" doc:id="53c19d74-f049-43cd-b601-49eca7d92c85" >
+		<servicenow:basic-connection username="admin" password="GcNl3dJ8+X/h" serviceAddress="https://dev56757.service-now.com/" />
+	</servicenow:config>
+	<sub-flow name="servicenow" doc:id="893dfb5c-06dd-4349-89cc-2cf98923d31f" >
+		<ee:transform doc:name="Transform Message" doc:id="b819497b-51e9-4ab7-a193-1bb8ee45abd1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/incident
+---
+{
+	ns0#insert: {
+		caller_id:  "randal.gansen@example.com" ,
+		description: payload.description,
+		urgency: 3
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<servicenow:invoke service="incident" operation="insert" doc:id="4b7aa529-b2cb-441f-92b9-9a9688693b69" config-ref="ServiceNow_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="6c743580-00ca-40c7-8b71-7ce406349585" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+ns ns0 http://www.service-now.com/incident
+
+output application/json
+---
+{
+	incidentNo : payload.body.insertResponse.number,
+	sys_id : payload.body.insertResponse.sys_id
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<error-handler name="global-error-handler" doc:id="58b695cc-c264-4e77-ad39-915150734ae5" >
+		<on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="5248aa76-b6f9-4782-b438-5348543a944c" name="servicenow"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="562fe6af-7172-482d-b34d-97efc02fa5e2" name="servicenow"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="ec9b917e-d8fa-4fc0-86ce-0c468d4b8b90" name="servicenow"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="04632482-8b35-4481-92a0-cb6d8a52f98e" name="servicenow"/>
+            
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c4d827ac-ecb0-4772-a55d-0d661ab4046a" type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="1dcdd51d-f6f4-41a7-9ddd-a07106e87de2" name="servicenow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="61b23ed2-59b1-4350-87cf-41b9bdcedbba" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="7b4a943c-7b4a-4518-b225-45e63603440e" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+  
+  ]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="6cfed4f1-72c1-4997-b18f-8653f223c82f" name="servicenow"/>
+		</on-error-propagate>
+	</error-handler>
+</mule>

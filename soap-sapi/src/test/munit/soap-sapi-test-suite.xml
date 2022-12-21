@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="soap-sapi-test-suite.xml" />
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest" doc:id="08a6f78a-f382-492f-b149-4cdd998a82bf" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8f76a932-c999-40be-ad74-5acb5b9c3fec" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="WebSerive GetArr Consume" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://board-details-resp.json")]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b7c88ca3-5f7e-4603-8563-e74d2c031738" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\boarddetails:application\json:mytrains-soap-sapi-config" doc:id="12969896-9b35-4d3e-852e-646bddc6c431" name="post:\boarddetails:application\json:mytrains-soap-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="239eb6c5-9ecf-4930-9e6e-54cca32e10d7" is="#[MunitTools::notNullValue()]" expression="#[payload.GetArrBoardWithDetailsResponse.GetStationBoardResult.locationName]"/>
+			<munit-tools:assert-equals doc:name="Assert equals locationName" doc:id="112eea48-f601-4486-bb5e-3d7c97adfff1" actual="#[payload.GetArrBoardWithDetailsResponse.GetStationBoardResult.locationName]" expected="Abbey Wood"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-APIKIT:NOT_FOUND" doc:id="311dd3e7-887a-4bf2-b440-46a950e6e4ae" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="429e6c32-8181-47d0-947a-7fd9fe5d9f36" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6001aa01-dc3b-400c-968e-63ecb86a9628" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="18c60380-b14b-4810-b96a-fd235dde2f9a" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="8cb0fd01-2f0b-4f3c-b745-6352930affe4" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-APIKIT:BAD_REQUEST" doc:id="41ffb232-16ec-4f51-9d76-e1ea284f2ec7" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0b3c63f2-c598-437b-a2a2-05460dd5322a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ac767517-7fea-42c0-b374-fcdbb67b37a1" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="41486e14-4d3a-4f9c-807a-a45e31c292d5" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="e157fbce-0943-4551-a6c9-e3ef0dc76f9f" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-APIKIT:NOT_IMPLEMENTED" doc:id="a29e270a-c94d-4e15-9b62-a3280f38a097" description="Test" expectedErrorType="APIKIT:NOT_IMPLEMENTED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="38eecca0-49bf-47e9-a984-1aa2ef339f5d" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c7649fef-a2d2-4b16-9896-abd2311a6f1c" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="370cffc6-4786-40b7-8a22-12062bf4574e" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="cdcc3bbb-7d9a-4b2a-970c-163044776038" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-console-APIKIT:NOT_FOUND" doc:id="699736fa-0879-4154-96f7-c46fb58d0ce7" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ddae64c7-cd4c-49bc-8a92-1e85dc22c1e6" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="7751655c-776b-44b5-8650-0ba336e8302c" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-console" doc:id="5d0a34de-2a26-49af-a3f7-521231b50df4" name="mytrains-soap-sapi-console"/>
+		
+</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-APIKIT:METHOD_NOT_ALLOWED" doc:id="e02d6ceb-3e54-43b5-8571-636cd45b87cf" description="Test" expectedErrorType="APIKIT:METHOD_NOT_ALLOWED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="df9a8226-0e9c-4f6a-bb93-10e1ca132694" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6211633f-4ee1-4dd5-9f10-b796de6e91a2" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="220c166a-ece8-42c1-aedc-309a472111a1" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="5f2fc1c1-9d08-4002-853b-0abb04d5b68a" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-APIKIT:NOT_ACCEPTABLE" doc:id="9db5af90-dd6d-45a8-849b-d4e8a546b7df" description="Test" expectedErrorType="APIKIT:NOT_ACCEPTABLE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ba3894b1-c4c1-4375-974a-b4af4862c11e" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a6a7a345-0531-4750-8584-e798eca17e6d" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="1763a59f-c8cb-4bc7-bfbb-3b195d0bec53" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="694b3b03-6f7e-46f0-a590-eacabeb400e2" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="dd64b6c3-c275-4d4d-887b-43c9f3c78522" description="Test" expectedErrorType="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="cc262b9f-bb75-41e9-861e-9a135344ffc3" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="32e529a7-c322-4b56-8410-7b4b0b113439" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="fc768bc2-e405-4414-b36e-656836438835" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="2d69ab6f-3964-4d69-9430-c8b0ea9c0ab9" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+	<munit:test name="soap-sapi-test-suite-postBoardDetailsTest-ANY" doc:id="47e5a92e-b5c8-4f9b-8b36-cd2f14dc4aab" description="Test" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9b98ad53-17e6-4117-b985-c5afaf21671b" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-soap-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="09175075-fcbb-40dd-8000-4fbae6da10b6" processor="servicenow:invoke">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Invoke" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="85ca9b9f-e559-487f-b641-434c7a305660" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-soap-req.json")]' mediaType="application/json" />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow Reference to mytrains-soap-sapi-main" doc:id="20c0149a-f8dd-436c-9765-8bbb9f8c60f4" name="mytrains-soap-sapi-main"/>
+		
+			</munit:execution>
+	</munit:test>
+
+</mule>

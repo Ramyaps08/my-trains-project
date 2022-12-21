@@ -1,0 +1,50 @@
+#%RAML 1.0 DataType
+type: object
+displayName: "Get arrival board with deatils"
+properties:
+  AccessToken:
+    type: object
+    displayName: "AccessToken"
+    properties:
+      TokenValue:
+        type: string
+        displayName: "TokenValue"
+        example: "86cdc061-3f79-46b1-aee9-b1cccfd4ef5f"
+  GetArrBoardWithDetailsRequest:
+    type: object
+    displayName: "GetArrBoardWithDetailsRequest"    
+    properties:
+      numRows:
+        type: number
+        displayName: "numRows"
+        example: 40
+      crs:
+        type: string
+        displayName: "crs"  
+        example: "BSK"
+      filterCrs:
+        type: string
+        displayName: "filterCrs"
+        example: "WAT"
+      filterType:
+        type: string
+        displayName: "filterType"
+        example: "to"
+      timeOffset:
+        type: number
+        displayName:  "timeOffset"
+        example: 0
+      timeWindow:
+        type: number 
+        displayName: "timeWindow" 
+        example: 120
+          
+          
+          
+          
+          
+          
+
+          
+
+          

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="41069cf4-66ae-4f41-8b3b-f6b73443930d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<servicenow:config name="ServiceNow_Config" doc:name="ServiceNow Config" doc:id="5cccc068-9fd5-42fa-9f85-4b328bfec3a7" >
+		<servicenow:basic-connection username="admin" password="GcNl3dJ8+X/h" serviceAddress="https://dev56757.service-now.com/" />
+	</servicenow:config>
+	<flow name="postServicenowCreateTicket" doc:id="8512efa8-8f56-4095-a4ec-733b052191b6" >
+		<http:listener doc:name="POST/servicenow/createTicket" doc:id="a9b0ef40-6b34-41eb-89a4-39762453a979" config-ref="HTTP_Listener_config" path="/servicenow/createTicket"/>
+		<ee:transform doc:name="Transform Message" doc:id="1297b849-59dc-490b-a3fd-ce3e79d7712f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/incident
+---
+{
+	ns0#insert: {
+		caller_id: payload.caller_id,
+		description: payload.description,
+		urgency: payload.urgency
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<servicenow:invoke doc:name="Invoke" doc:id="194e09de-b020-4b0a-b039-f94d9260c595" config-ref="ServiceNow_Config" service="incident" operation="insert"/>
+		<ee:transform doc:name="Transform Message" doc:id="a9bb524c-a7f2-4726-a173-efc652726006" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0ns ns0 http://www.service-now.com/incidentoutput application/json---{	incidentNo : payload.body.insertResponse.number,	sys_id : payload.body.insertResponse.sys_id}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="ERROR" doc:name="Logger" doc:id="ddfb3624-6d08-4043-a681-5a0c5dace6d2" message="#[payload]"/>
+	</flow>
+</mule>

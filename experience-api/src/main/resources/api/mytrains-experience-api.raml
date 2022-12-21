@@ -1,0 +1,180 @@
+#%RAML 1.0
+title: MyTrains-Experience-API
+description: "Train Reservation"
+uses:
+  Okta-library: /exchange_modules/a6a89936-028e-4081-b802-1965f45926ed/okta-api-fragment/1.0.3/okta-api-fragment.raml
+  mysql-library: /exchange_modules/a6a89936-028e-4081-b802-1965f45926ed/mysql-fragment-api/1.0.4/mysql-fragment-api.raml
+  
+/usersregistration:
+  post:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: "Create User"
+    
+    body:
+      application/json:
+        type: Okta-library.createuser
+        example: !include /Examples/OktaExampleUserBody.json
+          
+    responses:
+            201:
+              body:
+                application/json:
+                  example: "User Registered"
+                 
+/login:
+  post:
+    headers:
+      Content-Type: 
+    description: "Primary Authentication"
+    body:
+      application/json:
+        type: Okta-library.primaryauthentication
+        example: !include /Examples/OktaExampleAuthenticationBody.json
+              
+    responses:
+            201:
+              body:
+                application/json:
+                  example: "login Successfull"
+/userinfo:
+  get:
+    description: "get user details with userid" 
+    responses:
+      200:
+        body:
+          application/json:
+            type: mysql-library.User
+                                                
+/updateuser:
+  put:
+    description: "updating user details"
+    body:
+      application/json:
+        type: mysql-library.UpdateUser
+        example: !include Examples/Userexample.json
+          
+    responses:
+      201:
+        body:
+          application/json:
+            example: "User details updated"
+              
+/subscription:
+  post:
+    description: "stores user subscribed train details"
+    body:
+      application/json:
+        type: mysql-library.SubscriptionTable
+        example: !include /Examples/subscriptionexample.json
+    responses:
+          201:
+            body:
+              application/json:
+                type: mysql-library.SubscriptionTable
+
+/subscription/updatesubscription:
+  put:
+    description: "Updating train Subscriptions"
+    body:
+      application/json:
+        type: mysql-library.UpdateSubscription
+    responses:
+          201:
+            body:
+              application/json:
+                example: Subscription updated for user
+/usersubscription:
+  get:
+    headers: 
+      Accept: 
+    description: "view subscription details"
+    responses:
+      200:
+        body:
+          application/json:
+            type: mysql-library.SubscriptionTable
+                    
+/change_password:
+  post:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: Change Password
+    body:
+      application/json:
+        type: Okta-library.changepassword
+        example: !include /Examples/OktaExampleChangePasswordBody.json
+               
+    responses:
+            201:
+              body:
+                application/json:
+                  example: "password changed"
+                              
+/recoverypassword:
+  post:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: "Forgot Password"
+    body:
+      application/json:
+        type: Okta-library.forgotpassword
+        example: !include /Examples/OktaExampleAuthenticationForgotPasswordBody.json
+
+    responses:
+      201:
+        body:
+          application/json:
+           example: "Password Recovered"
+/{userid}/logout:
+  delete:
+    headers:
+      Content-Type: 
+      Accept: 
+      Authorization: 
+    description: "Clear Session"
+    responses:
+      204:
+       
+        body:
+          application/json:
+            type: string
+            example:
+              description:"cleared session successfully"
+
+              
+    
+
+      
+
+    
+
+
+    
+                             
+            
+            
+                          
+        
+            
+                          
+
+          
+                                                        
+          
+                                 
+                    
+                
+                    
+                                          
+
+  
+                                     
+                    
+                          

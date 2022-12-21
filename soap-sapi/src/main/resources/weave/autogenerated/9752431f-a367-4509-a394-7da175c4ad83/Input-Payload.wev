@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_9752431f_a367_4509_a394_7da175c4ad83_Input_Payload = {
+  timeWindow: Number, 
+  numRows: Number, 
+  crs: String, 
+  filterCrs: String, 
+  timeOffset: Number, 
+  filterType: String, 
+  _?: Any
+}
+

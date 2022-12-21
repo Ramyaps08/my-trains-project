@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ea011dec-4bb5-4c8f-b20c-0757792438e2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="9b13025c-0110-4568-8348-c79fda63a5a9">
+		<http:request-connection host="dev-63431661.okta.com" protocol="HTTPS"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_Localhost" doc:name="HTTP Request configuration" doc:id="f9778352-cf1a-4431-b5d2-aa5bb7611939" responseTimeout="30000">
+		<http:request-connection host="localhost" port="8091" />
+	</http:request-config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="1927250e-669d-4123-9b4e-e68ab445f14c" environment="${mule.env}" />
+	<global-property doc:name="Global Property" doc:id="82d615b1-6263-4037-9f4e-ae6c2a960793" name="json.logger.application.name" value="jsonlogger" />
+	<global-property doc:name="Global Property" doc:id="5196a692-401f-4bbd-a10e-5b997f128a0b" name="json.logger.application.version" value="2" />
+	<global-property doc:name="Global Property" doc:id="7281b0de-5457-459c-9c3e-728d7e446e19" name="mule.env" value="dev" />
+	<flow name="PostUsers" doc:id="97e71f3e-fb7a-4e02-a8f4-2035258611f9" >
+		<!-- <http:listener doc:name="POST/users" doc:id="91db97ca-0ac0-4c9f-b078-f5e0cf3ae00a" config-ref="HTTP_Listener_config" path="/users"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="79708d30-abb4-4f8e-b114-2d77a3e0f430" config-ref="JSON_Logger_Config" message="Registering"/>
+		<http:request method="POST" doc:name="invoke-post-users" doc:id="c40027c7-843a-4706-afa7-efc29b02a57a" path="/api/v1/users" config-ref="HTTP_Request_configuration">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : attributes.headers.Authorization
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"activate" : true
+}]]]></http:query-params>
+		</http:request>
+		<json-logger:logger doc:id="4977a191-581e-41e3-b399-6344f2826b4f" config-ref="JSON_Logger_Config" message="Registration Successfull"/>
+	</flow>
+	<flow name="Postchangepassword" doc:id="ad140c42-b621-495b-9eb0-bfdd0487ae08" >
+		<!-- <http:listener doc:name="POST/changepassword" doc:id="7ecd7f44-a3ec-44e1-90f8-a116b47d076c" config-ref="HTTP_Listener_config" path="/users/{userid}/credentials/change_password"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="37b805c0-c446-42d3-91d9-98577d03bcaf" config-ref="JSON_Logger_Config" message="User changing password"/>
+		<http:request method="POST" doc:name="invoke-post-chng-pswd" doc:id="b7a61f26-cf5b-4927-a90a-d1ee251fedf0" config-ref="HTTP_Request_configuration" path="/api/v1/users/{userId}/credentials/change_password">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : attributes.headers.Authorization
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"userId" : attributes.uriParams.userid
+}]]]></http:uri-params>
+		</http:request>
+		<json-logger:logger doc:name="Logger" doc:id="692b234a-b478-4ddf-8538-25ddfae69872" config-ref="JSON_Logger_Config" message="changed password"/>
+	</flow>
+	<flow name="postForgotPassword" doc:id="76db1c37-a0a8-4143-be9c-a58e6348b20e" >
+		<!-- <http:listener doc:name="Listener" doc:id="194fc45a-c6a3-433f-97b6-e9c4337d11c3" config-ref="HTTP_Listener_config" path="/authn/recovery/password"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="f61381e7-ca8a-469a-b698-dfb3a0b61900" config-ref="JSON_Logger_Config" message="Recovering Password"/>
+		<http:request method="POST" doc:name="invoke-post-fgt-pswd" doc:id="790b24b7-eb79-44d8-bed8-a5844a5ddd72" config-ref="HTTP_Request_configuration" path="/api/v1/authn/recovery/password"/>
+		<json-logger:logger doc:name="Logger" doc:id="f8c5e151-2a53-4a24-8272-7319e58ab843" config-ref="JSON_Logger_Config" message="Password Recovered"/>
+	</flow>
+	<flow name="PostAuthn" doc:id="471810ac-1456-4177-8aec-ad36d8a5f4cd" >
+		<!-- <http:listener doc:name="POST/authn" doc:id="48b1af29-a183-43a7-b19c-3abcf3e3893e" config-ref="HTTP_Listener_config" path="/authn" allowedMethods="POST"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="7737af78-43a9-4e50-8af5-f04cc03b6c8d" config-ref="JSON_Logger_Config" message="User logging in"/>
+		<http:request method="POST" doc:name="invoke-post-authn" doc:id="ce9b5bcd-8633-45ae-a6e7-a1ec3080fb06" config-ref="HTTP_Request_configuration" path="/api/v1/authn" responseTimeout="100000">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Aut" : attributes.headers.Aut
+}]]]></http:headers>
+		</http:request>
+		<json-logger:logger doc:name="Logger" doc:id="91c4d795-3eab-44c5-8b50-3f08a343284a" config-ref="JSON_Logger_Config" message="Logged in"/>
+	</flow>
+	<flow name="PostSessions" doc:id="34d7dea9-f0b4-43f7-9003-635c1e1b498d" >
+		<!-- <http:listener doc:name="POST/sessions" doc:id="247b6c32-14b6-41ae-b800-a44cc9e5206c" config-ref="HTTP_Listener_config" path="/sessions" allowedMethods="POST"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="b32f3da7-a3ed-40a3-8297-bc3de9be4055" config-ref="JSON_Logger_Config" message="Creating session with Session Token"/>
+		<http:request method="POST" doc:name="invoke-post-sessions" doc:id="dad4592f-ed2e-48bb-bc59-5dbf6f536795" config-ref="HTTP_Request_configuration" path="/api/v1/sessions">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : attributes.headers.Authorization
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"additionalFields" : "cookieToken"
+}]]]></http:query-params>
+		</http:request>
+		<json-logger:logger doc:name="Logger" doc:id="8edaad2c-549c-49b9-8fe5-117ba4915d13" config-ref="JSON_Logger_Config" message="Session Created"/>
+	</flow>
+	<flow name="getValidatesession" doc:id="1a5f0213-51ed-4e5a-81cc-140e14c9c549" >
+		<!-- <http:listener doc:name="GET/sessions" doc:id="f58915da-5e30-4d1b-95e0-de699363fe34" config-ref="HTTP_Listener_config" path="/sessions/{sessionid}" allowedMethods="GET"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="7db58e85-3ca0-4ed1-962d-7b2d2b899858" config-ref="JSON_Logger_Config" message="Validating Session"/>
+		<set-variable value="#[attributes.uriParams.sessionid]" doc:name="sessionid" doc:id="d7aa44b8-401d-4fc8-b2a1-3513633ff009" variableName="sessionid"/>
+		<http:request method="GET" doc:name="invoke-get-validate-session" doc:id="d7466328-2959-41a0-a2f2-3c42c891490b" config-ref="HTTP_Request_configuration" path="/api/v1/sessions/{sessionId}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : attributes.headers.Authorization
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"sessionId" : vars.sessionid
+}]]]></http:uri-params>
+		</http:request>
+		<json-logger:logger doc:name="Logger" doc:id="b380ded9-0920-46a2-a91d-50b5f0c7ab51" config-ref="JSON_Logger_Config" message="Session Validated"/>
+	</flow>
+	<flow name="deleteSessions" doc:id="576a6c12-8f42-4ceb-90ab-cdb57eca0513" >
+		<!-- <http:listener doc:name="Listener" doc:id="7ebcd963-2881-4d3c-b7f2-a9bcb47ba703" config-ref="HTTP_Listener_config" path="/sessions/{sessionid}" allowedMethods="DELETE"/> -->
+		<json-logger:logger doc:name="Logger" doc:id="c3328c5e-c5a0-4eb4-84bb-99fe6314792b" config-ref="JSON_Logger_Config" message="Logging out"/>
+		<http:request method="DELETE" doc:name="invoke-delete-sessions" doc:id="4e37af83-6eb1-41ad-8083-d4d475d38a30" config-ref="HTTP_Request_configuration" path="/api/v1/sessions/{sessionId}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : attributes.headers.Authorization
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"sessionId" : attributes.uriParams.sessionid
+}]]]></http:uri-params>
+		</http:request>
+		<json-logger:logger doc:name="Logger" doc:id="e9d91d4f-a61b-4542-800c-035f96bc5e29" config-ref="JSON_Logger_Config" message="Logged Out"/>
+	</flow>
+</mule>

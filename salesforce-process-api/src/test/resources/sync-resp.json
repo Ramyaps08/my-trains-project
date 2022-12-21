@@ -1,0 +1,13 @@
+ 
+ [
+ {
+      "EMAIL_ID" : "firstM@example.com",
+      "USER_ID" : "00u7l17u58zJTCIQT5d7",
+      "STATUS_TYPE_ID" : 1,
+      "UPDATED_TIMESTAMP" : "2022-12-10T01:35:46",
+      "LAST_NAME" : "Mule",
+      "PHONE_NUMBER" : "602567890",
+      "CREATED_TIMESTAMP" : "2022-12-10T01:32:45",
+      "FIRST_NAME" : "First"
+}
+]

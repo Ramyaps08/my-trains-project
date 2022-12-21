@@ -1,0 +1,53 @@
+#%RAML 1.0 DataType
+type: object
+displayName: Create user with password
+properties:
+  profile:
+    type: object
+    required: true
+    displayName: profile
+    properties:
+      firstName:
+        type: string
+        required: true
+        displayName: "firstName"
+        example: "Michael"
+      lastName:
+        type: string
+        required: true
+        displayName: "lastName"
+        example: "Brooke"
+      email:
+        type: string
+        required: true
+        displayName: "email"
+        example: "michaelb@example.com"
+      login:
+        type: string
+        required: true
+        displayName: login
+        example: "michaelb@example.com"
+  credentials:
+        type: object
+        required: true
+        displayName: credentials
+        properties:
+          password:
+            type: object
+            required: true
+            displayName: password
+            properties:
+              value:
+                type: string
+                required: true
+                displayName: "value"
+                example: "follow@432"
+         
+                       
+                
+            
+          
+          
+          
+          
+          

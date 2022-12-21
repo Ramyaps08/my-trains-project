@@ -1,0 +1,22 @@
+{
+	"GetStationBoardResult": {
+		"generatedAt": "2022-12-01T19:42:05.0723028+00:00",
+		"locationName": "Basingstoke",
+		"crs": "BSK",
+		"filterLocationName": "London Waterloo",
+		"filtercrs": "WAT",
+		"nrccMessages": [
+			{"message": "<p>\nDisruption between Reading and Didcot Parkway due to a safety inspection of the track. More details can be found in <a href=\"http://nationalrail.co.uk/service_disruptions/312172.aspx\">Latest Travel News.</a></p>"}
+		],
+		"platformAvailable": "true",
+		"trainServices": [{
+			"sta": "20:08",
+			"eta": "20:29",
+			"platform": "3",
+			"operator": "South Western Railway",
+			"operatorCode": "SW",
+			"serviceType": "train",
+			"serviceID": "MX/dYSh/06gpdDWWwhCQPA=="
+		}]
+	}
+}

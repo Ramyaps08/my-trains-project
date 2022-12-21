@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="mysql-sapi-test-suite.xml" />
+	<munit:test name="mysql-sapi-test-suite-postUserDetailsTest" doc:id="eed26d87-8bf4-4d38-a291-46eba1f348f2" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="57e017ba-a84d-4652-9a4f-8e976db914c8" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="7ca2fa78-8651-44de-8bc7-48983d5139e7" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="766d0887-4de3-469a-9923-8c2619d1422f" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="3484f036-0944-4868-8a23-c1d01f65fc37" is="#[MunitTools::notNullValue()]" expression="#[payload.message]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-putUpdateUserTest" doc:id="e957d35e-40f8-418a-940a-ef8e97723630" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a99ec834-bb6a-4881-a0d8-965727a1a3e5" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update-user" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://put-updtusr-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b0c48224-d854-4636-b8c1-e8808a3567c2" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://put-updtusr-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="put:\user\(userid)\updateuser:application\json:mytrains-mysql-api-config" doc:id="0a233749-27e8-4387-966f-e9d6d839752c" name="put:\user\(userid)\updateuser:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="152f31d0-0241-4c29-a5e0-7e636d542ffd" expression="#[payload.message]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-getuseruseridTest" doc:id="5a3ce2c0-ad5a-486f-aa2b-d314d3a40a7a" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="029ec186-6f1a-42fe-8e94-2e66d08d63b9" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select-user -info" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://get-user-details-resp.json.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref toget:\user\(userid):mytrains-mysql-api-config" doc:id="e3154ff8-47b1-4b99-90e6-e12e8788a935" name="get:\user\(userid):mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="3d285f4d-a636-4a23-9c4b-c880497da7bf" expression="#[payload.USER_ID]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals USER_ID" doc:id="2526bbad-9e61-4bea-8d98-70665a43f0dc" actual="#[payload.USER_ID]" expected="00u7mi4vl965esL6p5d7"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-postSubscriptionTest" doc:id="2b374424-8803-45aa-aef6-6d77470494a3" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a467f772-b64e-471e-884a-8aef99af877a" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insert-subscription" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-subscription-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="58830afa-2528-40af-bd36-ae5e6f647d6a" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-subscription-req.json.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref topost:\user\(userid)\subscription:application\json:mytrains-mysql-api-config" doc:id="db1baff6-fb7c-46b3-8ab7-d9ddd9a4e79b" name="post:\user\(userid)\subscription:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ace75034-63cd-4da5-9d3e-02d4cf79c606" expression="#[payload.message]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-putupdateSubscriptionTest" doc:id="14aa8479-4a66-46a9-92bd-14527f8a33a4" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="569bc1f7-74d2-487c-b233-276f52a8d9b5" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update-subscription-details" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://put-updtsubscr-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="89fe3a86-ae38-4890-a2ea-2e6f1a5911bb" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://put-updtsubscr-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to put:\user\(userid)\subscription:application\json:mytrains-mysql-api-config" doc:id="6dce4b80-6221-4071-a26f-6583632815ff" name="put:\user\(userid)\subscription:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b1a2a090-bd56-45e1-b57c-70d70a89b68f" expression="#[payload.message]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-getViewSubscriptionTest" doc:id="c512baec-a65c-4f8d-8945-39e249d68fbb" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5453b156-1f44-4abf-9233-de7fdbb1f1e8" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select-view-subs" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="42477e73-37dd-4866-b64e-95723bcc5dc0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://get-view-subs-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\user\(userid)\subscription:mytrains-mysql-api-config" doc:id="f2ec0989-2877-4744-96aa-3ad1263082a3" name="get:\user\(userid)\subscription:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that notNullValue" doc:id="77783cf5-47ec-4c4f-834b-236bf22db651" expression="#[payload.USER_ID]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals " doc:id="879cbc4c-c8c2-4bd9-b706-8a61cf79b845" actual="#[payload.USER_ID]" expected="00u7lyk09g3MM0FrO5d7"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-getSubscribedusersTest" doc:id="33585d6f-5597-4a27-8e78-a0ef415b0030" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b98282df-3909-4d77-9045-fd555d65d336" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select-subs-users" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e0c4eba9-866d-453b-b3c3-979d3dc519c9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://get-subs-users-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\subscribedusers:mytrains-mysql-api-config" doc:id="d66f3fb4-f1c8-4faa-932c-6dc2f58b9556" name="get:\subscribedusers:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="5cbf22fa-f83b-4793-a82c-68a97c52fe65" expression="#[payload.USER_ID]" is="#[MunitTools::notNullValue()]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="f3837dac-bdaa-4b4a-ba48-868b14b5590a" actual="#[payload.USER_ID]" expected="00u7mi4vl965esL6p5y7"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-postAlertsTest" doc:id="8dad71af-f8aa-4f36-9fbe-8816774cb536" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c2abfe74-6ef6-4938-a83e-8e1ef0bdf9fd" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insert-alerts-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ef213a86-752d-4d68-aab7-b3106ef3ee72" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-alerts-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="5cc17f4b-49c4-4833-a28c-a1a24141be4c" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-alerts-req.json.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref topost:\alerts:application\json:mytrains-mysql-api-config" doc:id="673b70a5-b40b-44e2-96dd-9f0de3836bb6" name="post:\alerts:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="fa5915a4-85b7-4029-a5ea-b456a2250178" expression="#[payload.message]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-APIKIT:BAD_REQUEST" doc:id="5c223a67-26b1-40c2-96f9-1a785468b1dc" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock apikit" doc:id="aee8a7c5-477c-4b99-9527-b98aaecb7678" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-experience-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="be252a41-3d0b-4c66-b1ee-af1cdc2d8470" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="76e41553-3ee8-4472-b725-d630aa20e705" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-v1-APIKIT:BAD_REQUEST" doc:id="46db3f2d-6ea8-4e43-83be-bad0992220ef" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock insertuser" doc:id="888ea6a4-6059-4920-a4bb-3f07c6d80926" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="87cd417a-c91b-44ca-8364-5bfa44b657d6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="eb5ec5c2-2389-456e-afba-44f7a725388b" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="da8fd86f-ad8a-494f-a9f1-14e06feebdc9" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-v1-APIKIT:METHOD_NOT_ALLOWED" doc:id="ed0e7360-d10a-4b8c-a02e-750d4abb1cdf" description="Test" expectedErrorType="APIKIT:METHOD_NOT_ALLOWED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock insertuser" doc:id="f091932a-bdcf-4106-bd69-89f8beb5332f" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="87cd417a-c91b-44ca-8364-5bfa44b657d6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="e7bbb553-dbb2-4cc1-88e9-06fc96cb4d9e" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="e8ad4194-4743-44b1-b232-2af378c8249c" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-v1-APIKIT:NOT_ACCEPTABLE" doc:id="4c482f19-9583-4a26-a002-c77812f7185a" description="Test" expectedErrorType="APIKIT:NOT_ACCEPTABLE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock insertuser" doc:id="ade37d32-b389-4a7f-8b34-00c33c0dc7ea" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="87cd417a-c91b-44ca-8364-5bfa44b657d6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="665e4ddc-992e-4182-ae4a-5957b05e8717" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="ae91ae5d-ba1f-476d-aad0-06c0dbaa962b" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-v1-APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="52798f74-2960-4b9d-8f69-20a4d8f05bbf" description="Test" expectedErrorType="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock insertuser" doc:id="e9c29c45-160e-495a-b8f3-6fa61f420e4a" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="87cd417a-c91b-44ca-8364-5bfa44b657d6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="cba933a7-7cdc-4efe-b80a-bff2a6ee52d1" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="7bfb8fe8-6273-43f7-bda3-a3d97729de0e" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-v1-APIKIT:NOT_IMPLEMENTED" doc:id="9f86faf7-f36f-472e-814a-ff6c7988f76a" description="Test" expectedErrorType="APIKIT:NOT_IMPLEMENTED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock insertuser" doc:id="9ee646d2-4c8e-4ca5-bb12-d61423d953f8" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="87cd417a-c91b-44ca-8364-5bfa44b657d6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="55933ef9-24dc-4bdd-b8ae-8e931379bc54" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="a36b8401-5ae5-43be-a80f-fb24f7ef3cfc" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-v1-APIKIT:NOT_FOUND" doc:id="fec966aa-e1dd-4bde-a29e-b8be494e8f0a" description="Test" expectedErrorType="APIKIT:NOT_FOUND" ignore="true">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock insertuser" doc:id="c3466a8e-d9ba-4208-9280-6441515c7d76" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="insert-user-details" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="87cd417a-c91b-44ca-8364-5bfa44b657d6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="cb79e9fe-9883-4058-a826-0ddceb8919aa" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\userdetails:application\json:mytrains-mysql-api-config" doc:id="fba7b3ab-6b1f-4aa4-bfb3-a67ca1240613" name="post:\userdetails:application\json:mytrains-mysql-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="mysql-sapi-test-suite-console-APIKIT:NOT_FOUND" doc:id="f352f9dc-5f4c-4363-a607-26aeb7622638" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Console" doc:id="57603311-3a3d-4dfb-aaee-88fb999a07ed" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-mysql-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-resp.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="8f538edb-1600-42fe-a78e-c6329d836501" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-req.json")]' />
+
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to mytrains-mysql-api-console" doc:id="cbd8a3c1-ff30-48fe-b8de-a84ea2a565fb" name="mytrains-mysql-api-console"/>
+		</munit:execution>
+		</munit:test>
+
+</mule>

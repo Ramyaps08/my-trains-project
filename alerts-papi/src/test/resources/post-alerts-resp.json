@@ -1,0 +1,19 @@
+{
+"body" : {
+  "GetArrBoardWithDetailsResponse": {
+    "GetStationBoardResult": {
+      "generatedAt": "2022-12-20T15:05:34.5778154+00:00",
+      "locationName": "Abbey Wood",
+      "crs": "ABW",
+      "filterLocationName": "Manchester Airport",
+      "filtercrs": "MIA",
+      "nrccMessages": {
+        "message": "\nTrains through Faversham may be cancelled or delayed by up to 30 minutes. More details can be found in <a href=\"//nationalrail.co.uk/service_disruptions/313879.aspx\">Latest Travel News</a>"
+      },
+      "platformAvailable": "true"
+    }
+  }
+},
+"headers": [],
+"attachments": []
+}

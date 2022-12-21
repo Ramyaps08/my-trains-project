@@ -1,0 +1,49 @@
+#%RAML 1.0 DataType
+type: object
+additionalProperties: false
+properties:
+  GetStationBoardResult:
+    type: object
+    required: false
+    properties:
+      generatedAt: 
+        type: string
+        required: true
+      locationName: 
+        type: string
+        required: true
+      crs: 
+        type: string
+        required: true
+      filterLocationName: 
+        type: string
+        required: false
+      filtercrs: 
+        type: string
+        required: false
+      filterType:
+        type: string
+        required: false
+      nrccMessages:
+        type: array
+        required: false
+        items:
+          type: object
+          properties:
+            message: 
+              type: string
+              required: false      
+      platformAvailable: 
+        type: string
+        required: false
+      areServicesAvailable:
+        type: boolean
+        required: false
+      trainServices:
+        type: array
+        required: false
+        items:
+          type: !include servicedataType.raml
+            
+
+      

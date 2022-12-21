@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="my-trains-exp-v2-test-suite.xml" />
+	<munit:test name="my-trains-exp-v2-test-suite-postUserRegistration-v2Test" doc:id="ca5876de-0e74-4c95-9763-a7624685cb45" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b696019a-dfae-492b-a0a5-65d157db4bba" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ebda2e83-f667-48dd-9ec1-069741afa449" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ca429657-594d-481b-bf73-cbe04abd1d9a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-sqlresp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="bdd5b409-754b-4d87-b992-81148ac6043f" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="4acb54ac-1283-47aa-a1ae-6c99d8782a50" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b8d006c6-a830-4515-9278-b7b4f4c4025d" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-postLogin-v2Test" doc:id="0f7e1f93-665a-4022-a821-168e08a54976" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8d55aa4a-2e08-442c-9d38-e708a89e9adb" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="16e7a455-8b8a-4258-b929-8866c9086897" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/authn" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-authn-resp.json.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6a2f2491-6a1e-46e9-ae1f-057ba1dd7215" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b609dcfd-a560-4c68-884b-47cf636d13bf" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/sessions" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-validsess-resp.json.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="cc2e30f0-2b0c-4768-bb8e-5199df31f644" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-authn-req.json.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\login:application\json:mytrains-experience-api-config" doc:id="97c5f183-5377-4463-af4b-14f01a0cf412" name="post:\login:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="23222cc2-90ee-4571-ae9d-cbbf2adfc592" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-getUserinfoTest" doc:id="f75c2f4c-6fdc-4afd-b2de-fde10148c391" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c0430cfd-0d14-4209-9175-d717941dfefc" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="253332f8-cda1-4ecb-bdce-f9bb4a36bf6b" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/user/{userid}" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://get-user-details-resp.json")]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\userinfo:mytrains-experience-api-config" doc:id="5fbba020-7b49-4d2e-953b-9900cbc7a480" name="get:\userinfo:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="4abc22c1-30e0-4d7d-9e95-a18c3ec96c80" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-putUpdateUser-v2Test" doc:id="c3c6a74e-2a4a-4b9b-a31a-baf5678b7739" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fa8c5238-34bf-4bdb-b018-d86597ee7a0d" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="26f7d55b-85d0-4cdf-b60b-aec3c15eee39" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/user/{userid}/updateuser" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://put-updtusr-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b63377b6-2c71-4db0-9c60-7bdea047d995" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://put-updtusr-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to put:\updateuser:application\json:mytrains-experience-api-config" doc:id="d4b7b660-790e-42a6-881b-004b06a0bd7d" name="put:\updateuser:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="f1c93965-067b-454c-ac28-d540d9f2054e" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-postSubscription-v2Test" doc:id="06b5a914-a98d-4a41-a3a7-bcacdb21ffce" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6f97da7b-626e-467c-a91c-1cb93198ba71" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b7cc1bb9-d97f-493e-ba09-d172fb52eab2" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/user/{userid}/subscription" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-subscription-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b4b37153-36c3-4439-9108-289c073352b6" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-subscription-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref topost:\subscription:application\json:mytrains-experience-api-config" doc:id="7bf434ba-e6f1-4784-961f-0f0a90035c62" name="post:\subscription:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="79823a28-a588-4e24-8dba-bc42adabbd63" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-putUpdateSubscription-v2Test" doc:id="f15da183-00c3-45cd-bc4b-75048c813560" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="614b1cf9-2a16-4059-9618-56adc1798170" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="35e37ccb-57f7-4b0a-a8af-8d17244f42fc" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/user/{userid}/subscription" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://put-updtsubscr-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a924e575-1765-4b80-8f1e-8085ddf1a1b9" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://put-updtsubscr-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to put:\subscription\updatesubscription:application\json:mytrains-experience-api-config" doc:id="06392710-48d7-4029-8528-8a973de437a2" name="put:\subscription\updatesubscription:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c14b1534-74c2-422e-a7a6-1cf2a31bb959" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-getSubscriptiondetailsTest" doc:id="bfeab89f-237f-445a-a5df-ad8335f4a533" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="37dd439b-959d-4bdf-a925-e9a220476376" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="5e5f08ed-0420-47c0-8e09-1651d722e0d9" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/user/{userid}/subscription" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://get-subsdetails-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref toget:\usersubscription:mytrains-experience-api-config" doc:id="d66477ef-03fd-4a3f-8b8b-a1c837486861" name="get:\usersubscription:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="4c58b49d-6696-47a0-b7ad-dae17ed196f3" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-postChangePassword-v2Test" doc:id="823c339d-7483-41c8-ad80-3a36d7e34509" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0c91de78-87f5-49d3-a7c8-857d94b0fd47" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="73454618-01df-429f-9ca5-fe13b3927e93" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/users/{userid}/credentials/change_password" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-chng-pswd-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="58e3ddcc-06ee-4f39-81b5-abc846b0f2e7" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-chng-pswd-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\change_password:application\json:mytrains-experience-api-config" doc:id="2e216fb1-63bc-4ec2-9b30-e4478b2aa4b3" name="post:\change_password:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6862e11c-0c19-4b94-8e2d-a9e50f76bdbf" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-postRecoveryPassword-v2Test" doc:id="ff7ceae2-5463-4ff3-be89-7a9839dbe954" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b35d54ec-4e99-4ada-8ce8-bc46cca39cd1" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="1566fa61-389d-43bc-8b63-8e05eb850143" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="HTTP_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output applicatio/json --- readUrl("classpath://post-fgt-pswd-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="004f4a27-4a6c-4aab-bd95-e430b4c026eb" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-fgt-pswd-req.json")]' mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\recoverypassword:application\json:mytrains-experience-api-config" doc:id="39bf22b5-3b9e-4ad9-9465-1a4bb12a14d0" name="post:\recoverypassword:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="65236853-48ec-44be-9d89-c83672ae2eb8" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-DELETELogOut-v2Test" doc:id="c3fbde7d-c939-417f-9a85-2fa933499cd0" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5ed6f17a-8053-4b1d-9293-79ff57187cc2" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fc8cecf4-89bb-49da-8f0d-24c73a5c4c72" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="/api/sessions/{sessionid}" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://delete-user-resp.json")]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to delete:\logout:mytrains-experience-api-config" doc:id="455e48f6-5102-4f26-a422-a75d84518ba3" name="delete:\logout:mytrains-experience-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="0786a33b-c013-417a-8b05-3d8d306106e4" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="my-trains-exp-v2-apikit-test-suite-APIKIT:BAD_REQUEST" doc:id="54ab7760-7c25-41a2-94b0-f90e90eac4f0" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock apikit" doc:id="551e4533-11d2-4d76-afa7-725dc8179953" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-experience-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="fff2abfb-f592-485c-a2ff-2edc2f8d67e7" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to mytrains-experience-api-main" doc:id="857fb2dd-2e7d-48f1-9358-e7ca1b47a914" name="mytrains-experience-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-APIKIT:BAD_REQUEST" doc:id="4a36d4d9-bd12-4b4e-99f3-e513cb049313" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Registration" doc:id="1df76e94-8334-4b15-a5c7-6e4b1416d3cb" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="4e54bbfd-9215-431a-a6fe-9f4913ad6358" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="51ae1405-0d21-4e0c-9fd7-5b70fed31f7e" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-APIKIT:METHOD_NOT_ALLOWED" doc:id="aa80987e-0bd4-457d-91f0-5a66ae547653" description="Test" expectedErrorType="APIKIT:METHOD_NOT_ALLOWED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Registration" doc:id="87ff4235-a0b9-4dad-a2cd-11b37e341f27" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="2e439fcc-4d4b-41f9-b62b-b78216b4c06b" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="94c24bfa-1c8d-4e66-a79a-e5ea222d3460" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-APIKIT:NOT_ACCEPTABLE" doc:id="0c417ed1-24ae-4e67-8533-c10211afa884" description="Test" expectedErrorType="APIKIT:NOT_ACCEPTABLE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Registration" doc:id="ea625104-52d7-4b3f-8ad6-800c783f32f5" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="85579cc6-a8dd-4ac2-859a-340631bdfd41" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="7aec87dd-7d04-4509-a5f8-5d6130d11a17" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="a1233e6d-cf1b-4187-8a7a-2a1d5c9ae580" description="Test" expectedErrorType="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Registration" doc:id="f41ad4af-56ee-4982-9559-946fd69af641" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="1d75d181-8a18-4ca7-8981-c502c93a1c44" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="c96befd6-292a-4dfb-9bb7-a4a144d99340" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-APIKIT:NOT_IMPLEMENTED" doc:id="c553c9d9-9f59-40b9-bedd-0e516eb889ab" description="Test" expectedErrorType="APIKIT:NOT_IMPLEMENTED">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Registration" doc:id="aaeffe04-0d59-4d9e-a917-3bcf37c8dd57" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="3cdae679-258a-4d0b-b85d-f7dbd2574e49" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="a598fe0e-bae0-469c-9521-0335413bb45e" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="my-trains-exp-v2-test-suite-APIKIT:NOT_FOUND" doc:id="3b73fd8e-6068-41ef-8848-9d1cc44129d7" description="Test" expectedErrorType="APIKIT:NOT_FOUND" ignore="true">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Registration" doc:id="cdb0b888-cbe1-403f-9000-c7fb9e3b1262" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Request" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b36f8660-9323-433e-aeef-ba53c14c54b9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a73de926-1558-48a4-a5b9-74140b8c2b7b" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\usersregistration:application\json:mytrains-experience-api-config" doc:id="5d4e23d1-d67b-41a4-a843-8a1eaeb1ee65" name="post:\usersregistration:application\json:mytrains-experience-api-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="okta-sapi-error-test-suite-console-APIKIT:NOT_FOUND" doc:id="f2f156c0-6456-4906-8a05-c5ceadffe154" description="Test" expectedErrorType="APIKIT:NOT_FOUND">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Console" doc:id="df3b3a7e-b120-4405-aeb7-c40f34a61f5e" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mytrains-experience-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://post-user-regis-resp.json.json")]' mediaType="application/json" />
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="6ca4d3d5-0f2a-4f64-bbe0-fc636f3a16ed" >
+				<munit:payload value='#[output application/json --- readUrl("classpath://post-user-regis-req.json")]' />
+
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to mytrains-experience-api-console" doc:id="676af905-05b4-44a9-9ef8-a3d92fca443b" name="mytrains-experience-api-console"/>
+		</munit:execution>
+	</munit:test>			
+</mule>

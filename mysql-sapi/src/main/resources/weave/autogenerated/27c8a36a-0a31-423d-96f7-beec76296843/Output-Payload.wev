@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_27c8a36a_0a31_423d_96f7_beec76296843_Output_Payload = {
+  STATUS_TYPE_ID: Number, 
+  EMAIL_ID: String, 
+  LAST_NAME: String, 
+  PHONE_NUMBER: Number, 
+  FIRST_NAME: String, 
+  _?: Any
+} {"label": "User Details"}
+

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_3e12866b_1036_48f0_9e36_46cef0d2b93d_Output_Variables_outboundHeaders = {| sessionid: Null |}
+
